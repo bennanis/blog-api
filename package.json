@@ -23,6 +23,7 @@
     "@nestjs/common": "^5.4.0",
     "@nestjs/core": "^5.4.0",
     "@nestjs/typeorm": "^5.2.2",
+    "@types/crypto-js": "^3.1.43",
     "mysql": "^2.16.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
