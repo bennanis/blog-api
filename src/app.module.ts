@@ -3,15 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersService } from './users/users.service';
-import { UsersController } from './users/users.controller';
-import { UsersModule } from './users/users.module';
-
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
+import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), UsersModule],
-  controllers: [AppController, UsersController],
-  providers: [AppService, UsersService],
+  imports: [TypeOrmModule.forRoot(), UserModule],
+  controllers: [AppController, UserController],
+  providers: [AppService, UserService],
 })
 
 export class AppModule {  
