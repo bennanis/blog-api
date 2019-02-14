@@ -11,6 +11,20 @@ export class UserService {
         private userRepository: Repository<UserEntity>,
     ) {}
 
+    async login(data: UserDTO){
+        if(!data.email || !data.password)
+            return {'success': false, 'info': 'Missing information'}
+        
+        const {email, password} = data;
+        let user = await this.userRepository.findOne({where: {email}})
+        if(!user)
+            return {'success': false, 'info': 'Wrong email address'}
+        else if(!await user.comparePassword(password))
+            return {'success': false, 'info': 'Wrong password'}
+
+        return user.toResponseObject();
+    }
+
     async register(data: UserDTO){
         if(!data.email)
             return {'success': false, 'info': 'Missing email address'}
