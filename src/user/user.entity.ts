@@ -36,6 +36,13 @@ export class UserEntity {
         nullable: true,})
     avatar: string;
 
+    @Column({
+        name: "is_author",
+        type: "boolean",
+        default: false
+    })
+    is_author: boolean;
+
     @CreateDateColumn()
     created_at: Date;
 
@@ -58,13 +65,13 @@ export class UserEntity {
     }
 
     toResponseObject(showToken: boolean = true) {
-        const {id, email, avatar, created_at, updated_at, token} = this;
-        let responseObject:any = {id, email, avatar, created_at, updated_at};
+        const {id, email, avatar, created_at, is_author, updated_at, token} = this;
+        let responseObject:any = {id, email, avatar, is_author, created_at, updated_at};
 
         if(showToken)
             responseObject.token = token;
 
-        return responseObject;
+        return responseObject;  
     }
 
     private get token(){

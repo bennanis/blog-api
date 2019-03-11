@@ -1,12 +1,10 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
-
 import * as jwt from "jsonwebtoken";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
 
 
 @Injectable()
 export class AuthGaurd implements CanActivate {
+
 
     async canActivate(context: ExecutionContext):  Promise<boolean> {
         const request = context.switchToHttp().getRequest();
@@ -16,12 +14,17 @@ export class AuthGaurd implements CanActivate {
         
         const token = request.headers.authorization.split(' ')[1];
         const decoded = await this.validateToken(token);
-        console.log(decoded);
+        
         return decoded;
     }
 
     async validateToken(token: string){
-        const decoded = await jwt.verify(token, 'mySalt');
-        return decoded;
+        try{
+            const decoded = await jwt.verify(token, 'mySalt');
+            return decoded;
+        } catch(e) {
+            console.error('Invalid token');
+        }
+
     }
 }

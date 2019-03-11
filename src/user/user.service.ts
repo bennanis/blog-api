@@ -10,6 +10,11 @@ export class UserService {
         @InjectRepository(UserEntity)
         private userRepository: Repository<UserEntity>,
     ) {}
+    private loggedUser: UserDTO;
+
+    async getLoggedUser(){
+        return this.loggedUser;
+    }
 
     async login(data: UserDTO){
         if(!data.email || !data.password)
@@ -22,6 +27,7 @@ export class UserService {
         else if(!await user.comparePassword(password))
             return {'success': false, 'info': 'Wrong password'}
 
+        this.loggedUser = user.toResponseObject(false); 
         return user.toResponseObject();
     }
 
@@ -43,4 +49,6 @@ export class UserService {
 
         return {'success': true, 'info': 'Successful registration'}
     }
+
+
 }
