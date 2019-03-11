@@ -22,6 +22,6 @@ export class UserController {
     @Get('t')
     @UseGuards(new AuthGaurd())
     allUsers(@Body() data: UserDTO){
-        return 'rzrez';
+        return this.userService.getLoggedUser();
     }
 }

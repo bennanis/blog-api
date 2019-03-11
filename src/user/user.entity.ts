@@ -3,6 +3,12 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert,
 import * as jwt from 'jsonwebtoken';
 import * as CryptoJS from 'crypto-js';
 
+export enum UserRole {
+    ADMIN = "admin",
+    AUTHOR = "author",
+    STANDARD = "standard"
+}
+
 @Entity('user')
 export class UserEntity {
     
@@ -43,6 +49,14 @@ export class UserEntity {
     })
     is_author: boolean;
 
+    @Column({
+        name: "type",
+        type: "enum",
+        enum: UserRole,
+        default: UserRole.STANDARD
+    })
+    type: UserRole
+
     @CreateDateColumn()
     created_at: Date;
 
@@ -65,8 +79,8 @@ export class UserEntity {
     }
 
     toResponseObject(showToken: boolean = true) {
-        const {id, email, avatar, created_at, is_author, updated_at, token} = this;
-        let responseObject:any = {id, email, avatar, is_author, created_at, updated_at};
+        const {id, email, avatar, created_at, is_author, type, updated_at, token} = this;
+        let responseObject:any = {id, email, avatar, is_author, type, created_at, updated_at};
 
         if(showToken)
             responseObject.token = token;
