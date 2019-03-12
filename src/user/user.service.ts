@@ -1,4 +1,4 @@
-import { Injectable, Req } from '@nestjs/common';
+import { Injectable, Req, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
@@ -16,7 +16,8 @@ export class UserService {
         return this.loggedUser
     }
 
-    async login(data: UserDTO){
+    async login(data: UserDTO)
+    {
         if(!data.email || !data.password)
             return {'success': false, 'info': 'Missing information'}
         
@@ -31,23 +32,37 @@ export class UserService {
         return user.toResponseObject(true);
     }
 
-    async register(data: UserDTO){
+    async register(data: UserDTO)
+    {
         if(!data.email)
-            return {'success': false, 'info': 'Missing email address'}
+            throw new HttpException('Missing email address!', 404);
 
         const {email} = data;
         let user = await this.userRepository.findOne({where: {email}});
 
         if(user)
-            return {'success': false, 'info': 'User already exists'}
+            throw new HttpException('User already exists !', 404);
         
         if(!data.password || !data.first_name || !data.last_name)
-            return {'success': false, 'info': 'Missing information'}
+            throw new HttpException('Missing information !', 404);
 
         user = await this.userRepository.create(data);
         await this.userRepository.save(user);
 
-        return {'success': true, 'info': 'Successful registration'}
+        throw new HttpException('Successful registration !', 200);
+    }
+
+
+    getUser(userId: number): Promise<UserInfoDTO>
+    {
+        let id = Number(userId);
+        return  new Promise(async resolve => {
+            let user = await this.userRepository.findOne(userId);
+            if (!user) {
+                throw new HttpException('User does not exist!', 404);
+            }
+            resolve(user.toResponseObject());
+        });
     }
 
 
