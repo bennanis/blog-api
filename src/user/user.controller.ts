@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Get, Req, HttpException} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Req, HttpException, Param, Put} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDTO, UserInfoDTO } from './user.dto';
 import { AuthGaurd } from 'src/shared/auth.gaurd';
@@ -26,6 +26,17 @@ export class UserController {
         if (logguedUser === undefined) {
             throw new HttpException('User does not exist!', 404);
         }
-        return this.userService.getUser(logguedUser.id);
+        return this.userService.getById(logguedUser.id);
+    }
+    
+    @Put('user/update')
+    @UseGuards(new AuthGaurd())
+    async update(@Body() data: Partial<UserInfoDTO>){
+        let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
+        if (logguedUser === undefined) {
+            throw new HttpException('User does not exist!', 404);
+        }
+
+        return this.userService.update(logguedUser.id, data) ;
     }       
 }

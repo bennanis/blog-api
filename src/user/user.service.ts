@@ -53,9 +53,8 @@ export class UserService {
     }
 
 
-    getUser(userId: number): Promise<UserInfoDTO>
+    getById(userId: number): Promise<UserInfoDTO>
     {
-        let id = Number(userId);
         return  new Promise(async resolve => {
             let user = await this.userRepository.findOne(userId);
             if (!user) {
@@ -65,5 +64,21 @@ export class UserService {
         });
     }
 
+    async update(id: number, data: Partial<UserInfoDTO>)
+    {
+        let user = await this.userRepository.findOne(id);
+        if (!user) {
+            throw new HttpException('User does not exist!', 404);
+        }
+        if(data.first_name)
+            user.first_name = data.first_name;
+        if(data.last_name)
+            user.last_name = data.last_name;
+        if(data.avatar)
+            user.avatar = data.avatar;
+
+        await this.userRepository.update(id, user);
+        throw new HttpException('Success update !', 200);
+    }
 
 }
