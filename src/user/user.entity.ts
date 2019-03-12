@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert,
 
 import * as jwt from 'jsonwebtoken';
 import * as CryptoJS from 'crypto-js';
+import { UserDTO, UserInfoDTO, UserLoginDTO } from "./user.dto";
 
 export enum UserRole {
     ADMIN = "admin",
@@ -78,14 +79,15 @@ export class UserEntity {
             return false;
     }
 
-    toResponseObject(showToken: boolean = true) {
-        const {id, email, avatar, created_at, is_author, type, updated_at, token} = this;
-        let responseObject:any = {id, email, avatar, is_author, type, created_at, updated_at};
-
-        if(showToken)
-            responseObject.token = token;
-
-        return responseObject;  
+    toResponseObject(showToken = false) {
+        const {id, email, avatar, first_name, last_name, created_at, is_author, type, updated_at, token} = this;
+        if(showToken){
+            let responseObject:UserLoginDTO = {id, email, first_name, last_name, avatar, is_author, type, created_at, updated_at, token};
+            return responseObject;  
+        }else {
+            let responseObject:UserInfoDTO = {id, email, first_name, last_name, avatar, is_author, type, created_at, updated_at};
+            return responseObject;  
+        }
     }
 
     private get token(){

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
-import { UserDTO } from './user.dto';
+import { UserDTO, UserInfoDTO } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -10,10 +10,10 @@ export class UserService {
         @InjectRepository(UserEntity)
         private userRepository: Repository<UserEntity>,
     ) {}
-    private loggedUser: UserDTO;
+    private loggedUser: UserInfoDTO;
 
-    async getLoggedUser(){
-        return this.loggedUser;
+    getLoggedUser(){
+        return this.loggedUser
     }
 
     async login(data: UserDTO){
@@ -26,9 +26,9 @@ export class UserService {
             return {'success': false, 'info': 'Wrong email address'}
         else if(!await user.comparePassword(password))
             return {'success': false, 'info': 'Wrong password'}
-
-        this.loggedUser = user.toResponseObject(false); 
-        return user.toResponseObject();
+            
+        this.loggedUser = user.toResponseObject(true); 
+        return user.toResponseObject(true);
     }
 
     async register(data: UserDTO){

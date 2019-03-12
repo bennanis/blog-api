@@ -5,7 +5,7 @@ import * as jwt from "jsonwebtoken";
 @Injectable()
 export class AuthGaurd implements CanActivate {
 
-
+ 
     async canActivate(context: ExecutionContext):  Promise<boolean> {
         const request = context.switchToHttp().getRequest();
         
@@ -14,7 +14,6 @@ export class AuthGaurd implements CanActivate {
         
         const token = request.headers.authorization.split(' ')[1];
         const decoded = await this.validateToken(token);
-        
         return decoded;
     }
 

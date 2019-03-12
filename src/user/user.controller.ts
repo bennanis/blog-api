@@ -1,6 +1,6 @@
-import { Controller, Post, Body, UseGuards, Get} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Req} from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDTO } from './user.dto';
+import { UserDTO, UserInfoDTO } from './user.dto';
 import { AuthGaurd } from 'src/shared/auth.gaurd';
 import { request } from 'https';
 import { UserEntity } from './user.entity';
@@ -21,7 +21,12 @@ export class UserController {
 
     @Get('t')
     @UseGuards(new AuthGaurd())
-    allUsers(@Body() data: UserDTO){
-        return this.userService.getLoggedUser();
-    }
+    allUsers(@Body() data: UserInfoDTO){
+        if(this.userService.getLoggedUser() !== undefined){
+            return this.userService.getLoggedUser();
+        } else {
+            return 'Please login !';
+        }
+          
+    }       
 }
