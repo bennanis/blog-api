@@ -78,6 +78,8 @@ export class UserService {
             user.avatar = data.avatar;
 
         await this.userRepository.update(id, user);
+        this.loggedUser = user.toResponseObject(true); 
+
         throw new HttpException('Success update !', 200);
     }
 
