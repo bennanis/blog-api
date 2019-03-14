@@ -24,4 +24,18 @@ export class ArticleService {
         throw new HttpException('create successfully ! ', 200);
     }
 
+    async delete(loggedUserId:number, articleId: number)
+    {
+        let article: ArticleDTO = await this.articleRepository.findOne(articleId);
+        if(!article){
+            throw new HttpException('Article not found ! ', 200);
+        }
+        if(article.author == loggedUserId){
+            await this.articleRepository.delete(articleId);
+            throw new HttpException('Delete successfully ! ', 200);
+        } else {
+            throw new HttpException('Delete : No permission ! ', 200);
+        }
+    }
+
 }
