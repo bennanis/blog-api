@@ -45,15 +45,25 @@ export class ArticleController {
         return this.articleService.noteArticle(logguedUser.id, articleId, data.grade) ;
     }
 
-    @Post('comment/:articleId')
+    @Post(':articleId/comment')
     @UseGuards(new AuthGaurd())
-    async commentArticle(@Param('articleId') articleId, @Body() data: any){
+    async addCommentArticle(@Param('articleId') articleId, @Body() data: any){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
         if (logguedUser === undefined) {
             throw new HttpException('User does not exist!', 404);
         }
-        return this.articleService.commentArticle(logguedUser.id, articleId, data.content);
+        return this.articleService.addCommentArticle(logguedUser.id, articleId, data.content);
     }
 
+    @Delete('/comment/:commentId')
+    @UseGuards(new AuthGaurd())
+    async deleteCommentArticle(@Param('commentId') commentId){
+        let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
+        if (logguedUser === undefined) {
+            throw new HttpException('User does not exist!', 404);
+        }
+        
+        return this.articleService.deleteCommentArticle(logguedUser.id, commentId) ;
+    }
 
 }

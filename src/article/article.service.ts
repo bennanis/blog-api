@@ -78,7 +78,7 @@ export class ArticleService {
         }
     }
 
-    async commentArticle(loggedUserId:number, articleId: number, content: string)
+    async addCommentArticle(loggedUserId:number, articleId: number, content: string)
     {
         let article: ArticleEntity = await this.articleRepository.findOne(articleId);
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
@@ -89,5 +89,17 @@ export class ArticleService {
         throw new HttpException('Comment added successfully ! ', 200);
     }
 
+    async deleteCommentArticle(loggedUserId:number, commentId: number)
+    {
+        let comment: CommentEntity = await this.commentRepository.findOne(commentId);
+        if(!comment){throw new HttpException('Comment not found ! ', 404);}
+
+        if(comment.author.id == loggedUserId){
+            await this.commentRepository.delete(commentId);
+            throw new HttpException('Delete successfully ! ', 200);
+        } else {
+            throw new HttpException('Delete : No permission ! ', 200);
+        }
+    }
 
 }
