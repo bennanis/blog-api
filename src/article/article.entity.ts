@@ -46,7 +46,7 @@ export class ArticleEntity {
 
 
 @Entity('note-article')
-export class NoteArticle {
+export class NoteArticleEntity {
     
     @PrimaryGeneratedColumn()
     id: number;
