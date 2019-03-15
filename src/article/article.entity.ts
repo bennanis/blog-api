@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, ManyToMany, ManyToOne} from "typeorm";
 
 import { ArticleDTO } from "./article.dto";
+import { UserEntity } from "src/user/user.entity";
+import { userInfo } from "os";
 
 @Entity('article')
 export class ArticleEntity {
@@ -23,8 +25,9 @@ export class ArticleEntity {
     @Column({type: "varchar", length: "255", nullable: true})
     picture: string;
 
-    @Column({type: "int", nullable: false})
-    author: number;
+    @ManyToOne(type => UserEntity)
+    @JoinColumn()
+    author: UserEntity;
 
     @CreateDateColumn()
     created_at: Date;
@@ -38,5 +41,31 @@ export class ArticleEntity {
         let responseObject:ArticleDTO = {id, titre, content, likes, disLikes, picture, author, created_at, updated_at};
         return responseObject;  
     }
+
+}
+
+
+@Entity('note-article')
+export class NoteArticle {
+    
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @OneToOne(type => UserEntity)
+    @JoinColumn()
+    user: UserEntity;
+
+    @OneToOne(type => ArticleEntity)
+    @JoinColumn()
+    article: ArticleEntity;
+
+    @Column({type: "int", default: 0})
+    grade: number;
+
+    @CreateDateColumn()
+    created_at: Date;
+
+    @UpdateDateColumn()
+    updated_at: Date;
 
 }

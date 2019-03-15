@@ -16,8 +16,7 @@ export class ArticleController {
         if (logguedUser === undefined) {
             throw new HttpException('User does not exist!', 404);
         }
-        data.author = logguedUser.id;
-        return this.articleService.create(data);
+        return this.articleService.create(logguedUser.id, data);
     }
     
     @Delete(':id')

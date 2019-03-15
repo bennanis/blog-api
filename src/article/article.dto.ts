@@ -1,3 +1,5 @@
+import { ArticleEntity } from "./article.entity";
+import { UserEntity } from "src/user/user.entity";
 
 
 export class ArticleDTO {
@@ -7,7 +9,17 @@ export class ArticleDTO {
     likes: number;
     disLikes: number;
     picture: string;
-    author: number;
+    author: UserEntity;
+    created_at: Date;
+    updated_at: Date;
+}
+
+
+export class NoteArticleDto {
+    id: number;
+    userId: UserEntity;
+    articleId: ArticleEntity;
+    grade: number
     created_at: Date;
     updated_at: Date;
 }
