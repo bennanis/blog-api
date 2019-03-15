@@ -42,7 +42,7 @@ export class ArticleService {
         if(!article){
             throw new HttpException('Article not found ! ', 200);
         }
-        if(article.author == user){
+        if(article.author.id == user.id){
             await this.articleRepository.delete(articleId);
             throw new HttpException('Delete successfully ! ', 200);
         } else {
@@ -84,8 +84,8 @@ export class ArticleService {
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
 
         if(!article){throw new HttpException('Article not found ! ', 404);}
-        let commentaire = await this.commentRepository.create({author: user, article: article, content: content});
-        await this.commentRepository.save(commentaire);
+        let comments = await this.commentRepository.create({author: user, article: article, content: content});
+        await this.commentRepository.save(comments);
         throw new HttpException('Comment added successfully ! ', 200);
     }
 

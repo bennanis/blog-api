@@ -24,7 +24,9 @@ export class ArticleEntity {
     @Column({type: "varchar", length: "255", nullable: true})
     picture: string;
 
-    @ManyToOne(type => UserEntity)
+    @ManyToOne(type => UserEntity, user => user.articles, {
+        eager: true
+    })
     @JoinColumn()
     author: UserEntity;
 
@@ -78,11 +80,15 @@ export class CommentEntity {
     id: number;
 
     // plusieurs commentaires peuvent être posséder par un utilisateur
-    @ManyToOne(type => UserEntity, author => author.comments)
+    @ManyToOne(type => UserEntity, author => author.comments, {
+        eager: true
+    })
     author: UserEntity;
 
     // plusieurs commentaires peuvent être posséder par un article
-    @ManyToOne(type => ArticleEntity, article => article.comments)
+    @ManyToOne(type => ArticleEntity, article => article.comments, {
+        eager: true
+    })
     article: UserEntity;    
 
     @Column({type: "text", nullable: false})
