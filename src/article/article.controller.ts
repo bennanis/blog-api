@@ -12,17 +12,29 @@ export class ArticleController {
 
     @Post()
     @UseGuards(new AuthGaurd())
-    async create(@Body() data: ArticleDTO){
+    async create(@Body() articleData: ArticleDTO){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
         if (logguedUser === undefined) {
             throw new HttpException('User does not exist!', 404);
         }
-        return this.articleService.create(logguedUser.id, data);
+        return this.articleService.create(logguedUser.id, articleData);
     }
     
-    @Delete(':id')
+    @Put(':articleId')
     @UseGuards(new AuthGaurd())
-    async delete(@Param('id') articleId){
+    async update(@Param('articleId') articleId, @Body() articleData: Partial<ArticleDTO>){
+        let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
+        if (logguedUser === undefined) {
+            throw new HttpException('User does not exist!', 404);
+        }
+
+
+        return this.articleService.update(logguedUser.id, articleId, articleData) ;
+    }  
+
+    @Delete(':articleId')
+    @UseGuards(new AuthGaurd())
+    async delete(@Param('articleId') articleId){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
         if (logguedUser === undefined) {
             throw new HttpException('User does not exist!', 404);
@@ -31,7 +43,7 @@ export class ArticleController {
         return this.articleService.delete(logguedUser.id, articleId) ;
     }
     
-    @Post('note/:articleId')
+    @Post(':articleId/note')
     @UseGuards(new AuthGaurd())
     async noteArticle(@Param('articleId') articleId, @Body() data: NoteArticleDto){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();

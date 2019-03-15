@@ -34,6 +34,31 @@ export class ArticleService {
         throw new HttpException('create successfully ! ', 200);
     }
 
+
+    async update(loggedUserId: number, articleId: number, articleData: Partial<ArticleDTO>)
+    {
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId);
+
+        if(!article){
+            throw new HttpException('Article not found ! ', 200);
+        }
+
+        if(article.author.id !== loggedUserId){
+            throw new HttpException('Permission denied ! ', 200);
+        }
+
+        if(articleData.content)
+            article.content = articleData.content;
+        if(articleData.titre)
+            article.titre = articleData.titre;
+        if(articleData.picture)
+            article.picture = articleData.picture;
+
+        await this.articleRepository.update(articleId, article);
+
+        throw new HttpException('Success update !', 200);
+    }
+
     async delete(loggedUserId:number, articleId: number)
     {
         let article: ArticleEntity = await this.articleRepository.findOne(articleId);
@@ -101,5 +126,7 @@ export class ArticleService {
             throw new HttpException('Delete : No permission ! ', 200);
         }
     }
+
+    
 
 }
