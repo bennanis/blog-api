@@ -1,6 +1,6 @@
 import { Injectable, HttpException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArticleEntity, NoteArticleEntity } from './article.entity';
+import { ArticleEntity, NoteArticleEntity, CommentEntity } from './article.entity';
 import { Repository } from 'typeorm';
 import { ArticleDTO, NoteArticleDto } from './article.dto';
 import { UserService } from 'src/user/user.service';
@@ -16,6 +16,8 @@ export class ArticleService {
         private userRepository: Repository<UserEntity>,
         @InjectRepository(NoteArticleEntity)
         private noteArticleRepository: Repository<NoteArticleEntity>,
+        @InjectRepository(CommentEntity)
+        private commentRepository: Repository<CommentEntity>,
         private userService: UserService
     ) {}
 
@@ -74,6 +76,17 @@ export class ArticleService {
             }
 
         }
+    }
+
+    async commentArticle(loggedUserId:number, articleId: number, content: string)
+    {
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId);
+        let user: UserEntity = await this.userRepository.findOne(loggedUserId);
+
+        if(!article){throw new HttpException('Article not found ! ', 404);}
+        let commentaire = await this.commentRepository.create({author: user, article: article, content: content});
+        await this.commentRepository.save(commentaire);
+        throw new HttpException('Comment added successfully ! ', 200);
     }
 
 

@@ -4,7 +4,6 @@ import { ArticleDTO, NoteArticleDto } from './article.dto';
 import { ArticleService } from './article.service';
 import { UserInfoDTO } from 'src/user/user.dto';
 import { AuthGaurd } from 'src/shared/auth.gaurd';
-import { async } from 'rxjs/internal/scheduler/async';
 import { isNumber } from 'util';
 
 @Controller('article')
@@ -44,6 +43,17 @@ export class ArticleController {
             throw new HttpException('Grade not defined', 404);
         }
         return this.articleService.noteArticle(logguedUser.id, articleId, data.grade) ;
-
     }
+
+    @Post('comment/:articleId')
+    @UseGuards(new AuthGaurd())
+    async commentArticle(@Param('articleId') articleId, @Body() data: any){
+        let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
+        if (logguedUser === undefined) {
+            throw new HttpException('User does not exist!', 404);
+        }
+        return this.articleService.commentArticle(logguedUser.id, articleId, data.content);
+    }
+
+
 }

@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert, UpdateDateColumn, Any, } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert, UpdateDateColumn, Any, OneToMany, } from "typeorm";
 
 import * as jwt from 'jsonwebtoken';
 import * as CryptoJS from 'crypto-js';
 import { UserDTO, UserInfoDTO, UserLoginDTO } from "./user.dto";
+import { CommentEntity } from "src/article/article.entity";
 
 export enum UserRole {
     ADMIN = "admin",
@@ -57,6 +58,10 @@ export class UserEntity {
         default: UserRole.STANDARD
     })
     type: UserRole
+
+    // un utilisateur peut avoir plusieurs commentaires
+    @OneToMany(type => CommentEntity, comments => comments.author)
+    comments: CommentEntity[];
 
     @CreateDateColumn()
     created_at: Date;

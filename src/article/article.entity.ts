@@ -1,8 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, ManyToMany, ManyToOne} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, ManyToOne, OneToMany} from "typeorm";
 
 import { ArticleDTO } from "./article.dto";
 import { UserEntity } from "src/user/user.entity";
-import { userInfo } from "os";
 
 @Entity('article')
 export class ArticleEntity {
@@ -28,6 +27,9 @@ export class ArticleEntity {
     @ManyToOne(type => UserEntity)
     @JoinColumn()
     author: UserEntity;
+
+    @OneToMany(type => CommentEntity, comments => comments.author)
+    comments: CommentEntity[];
 
     @CreateDateColumn()
     created_at: Date;
@@ -67,5 +69,28 @@ export class NoteArticleEntity {
 
     @UpdateDateColumn()
     updated_at: Date;
+}
 
+@Entity('comment')
+export class CommentEntity {
+    
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    // plusieurs commentaires peuvent être posséder par un utilisateur
+    @ManyToOne(type => UserEntity, author => author.comments)
+    author: UserEntity;
+
+    // plusieurs commentaires peuvent être posséder par un article
+    @ManyToOne(type => ArticleEntity, article => article.comments)
+    article: UserEntity;    
+
+    @Column({type: "text", nullable: false})
+    content: string;
+
+    @CreateDateColumn()
+    created_at: Date;
+
+    @UpdateDateColumn()
+    updated_at: Date;
 }
