@@ -120,7 +120,15 @@ export class ArticleService {
 
     async deleteCommentArticle(loggedUserId:number, commentId: number)
     {
-     //TO FIX
+        let comment: CommentEntity = await this.commentRepository.findOne(commentId, { relations: ["author"] });
+        if(!comment){throw new HttpException('Comment not found ! ', 404);}
+    
+        if(comment.author.id == loggedUserId){
+            await this.commentRepository.delete(commentId);
+            throw new HttpException('Delete successfully ! ', 200);
+        } else {
+            throw new HttpException('Delete : No permission ! ', 200);
+        }
 
     }
 
