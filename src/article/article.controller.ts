@@ -30,6 +30,16 @@ export class ArticleController {
     async getAll(@Param('offset') offset:number){
         return await this.articleService.getAll(offset);
     }
+
+    @Get('/allMine')
+    @UseGuards(new AuthGaurd())
+    async getAllMine(){
+        let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
+        if (logguedUser === undefined) {
+            throw new HttpException('User does not exist!', 404);
+        }
+        return await this.articleService.getAllMine(logguedUser.id);
+    }
     
     @Put(':articleId')
     @UseGuards(new AuthGaurd())

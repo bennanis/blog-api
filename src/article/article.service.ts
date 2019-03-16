@@ -41,13 +41,21 @@ export class ArticleService {
 
     async getAll(offset:number){
         offset = Number(offset);
-        let limit: number = offset+2;
-        console.log(limit,offset);
+        let limit: number = offset+20;
       return await this.articleRepository.createQueryBuilder("article")
         .select(["article.id", "article.titre", "article.created_at"])
         .leftJoinAndSelect("article.author", "user")
         .offset(offset)
         .limit(limit)
+        .orderBy("article.created_at", "DESC")
+        .getMany();
+    }
+
+    async getAllMine(loggedUserId: number){
+        let user: UserEntity = await this.userRepository.findOne(loggedUserId);
+
+        return await this.articleRepository.createQueryBuilder("article")
+        .where({author: user})
         .orderBy("article.created_at", "DESC")
         .getMany();
     }
