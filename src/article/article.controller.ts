@@ -89,4 +89,15 @@ export class ArticleController {
         return this.articleService.deleteCommentArticle(logguedUser.id, commentId) ;
     }
 
+    @Post('/comment/:commentId')
+    @UseGuards(new AuthGaurd())
+    async addCommentComment(@Param('commentId') commentId: number, @Body() data: any){
+        let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
+        if (logguedUser === undefined) {
+            throw new HttpException('User does not exist!', 404);
+        }
+
+        return this.articleService.addCommentComment(logguedUser.id, commentId, data.content) ;
+    }
+
 }

@@ -90,6 +90,10 @@ export class CommentEntity {
     @JoinColumn({ name: "article_id" })
     article: UserEntity;    
 
+    @OneToOne(type => CommentEntity)
+    @JoinColumn({ name: "parent_id" })
+    parent_id: CommentEntity;
+
     @Column({type: "text", nullable: false})
     content: string;
 

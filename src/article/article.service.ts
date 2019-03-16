@@ -145,6 +145,30 @@ export class ArticleService {
 
     }
 
+    async addCommentComment(loggedUserId:number, commentId: number, content: string)
+    {
+        let user: UserEntity = await this.userRepository.findOne(loggedUserId);
+
+        // Récupérer le commentaire
+        let comment: CommentEntity = await this.commentRepository.findOne(commentId, { relations: ["article"] });
+        if(!comment){throw new HttpException('Comment not found ! ', 404);}
+
+        let hasParent: number = await this.commentRepository.count({where: {parent_id: commentId}});
+
+        // Si le commentaire à déja un parent => renvoie msg d'erreur
+        if(hasParent){throw new HttpException('You can not add more than one comment ! ', 404);}
+            
+        // Récupérer l'artcile ou se trouve le commentaire
+        let article: ArticleEntity = await this.articleRepository.findOne(comment.article.id)
+
+        if(article.author.id == loggedUserId){
+            let commentAdd = await this.commentRepository.create({author: user, article: article, content: content, parent_id: comment});
+            await this.commentRepository.save(commentAdd);
+            throw new HttpException('Comment added successfully ! ', 200);
+        } else {
+            throw new HttpException('Add comment : No permission ! ', 200);
+        }
+    }
     
 
 }
