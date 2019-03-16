@@ -39,6 +39,19 @@ export class ArticleService {
         return article;
     }
 
+    async getAll(offset:number){
+        offset = Number(offset);
+        let limit: number = offset+2;
+        console.log(limit,offset);
+      return await this.articleRepository.createQueryBuilder("article")
+        .select(["article.id", "article.titre", "article.created_at"])
+        .leftJoinAndSelect("article.author", "user")
+        .offset(offset)
+        .limit(limit)
+        .orderBy("article.created_at", "DESC")
+        .getMany();
+    }
+
     async update(loggedUserId: number, articleId: number, articleData: Partial<ArticleDTO>)
     {
         let article: ArticleEntity = await this.articleRepository.findOne(articleId);

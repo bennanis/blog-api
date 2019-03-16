@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, UseGuards, Put, Param, Delete, Get } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, UseGuards, Put, Param, Delete, Get, Query } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { ArticleDTO, NoteArticleDto } from './article.dto';
 import { ArticleService } from './article.service';
@@ -24,6 +24,11 @@ export class ArticleController {
     @Get(':articleId')
     async getById(@Param('articleId') articleId:number){
         return this.articleService.getById(articleId);
+    }
+
+    @Get('/all/:offset')
+    async getAll(@Param('offset') offset:number){
+        return await this.articleService.getAll(offset);
     }
     
     @Put(':articleId')
