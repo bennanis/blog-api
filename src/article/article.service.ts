@@ -53,7 +53,6 @@ export class ArticleService {
 
     async getAllMine(loggedUserId: number){
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
-
         return await this.articleRepository.createQueryBuilder("article")
         .where({author: user})
         .orderBy("article.created_at", "DESC")

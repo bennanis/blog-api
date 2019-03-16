@@ -7,9 +7,9 @@ import { CommentEntity, ArticleEntity } from "src/article/article.entity";
 import { SectionEntity } from "src/article/section/section.entity";
 
 export enum UserRole {
-    ADMIN = "admin",
+    STANDARD = "standard",
     AUTHOR = "author",
-    STANDARD = "standard"
+    ADMIN = "admin"
 }
 
 @Entity('user')

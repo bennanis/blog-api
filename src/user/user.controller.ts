@@ -1,13 +1,16 @@
-import { Controller, Post, Body, UseGuards, Get, Req, HttpException, Param, Put} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Req, HttpException, Param, Put, Guard} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDTO, UserInfoDTO } from './user.dto';
-import { AuthGaurd } from 'src/shared/auth.gaurd';
+import { AuthGaurd } from 'src/user/guards/auth.gaurd';
 import { request } from 'https';
-import { UserEntity } from './user.entity';
+import { UserEntity, UserRole } from './user.entity';
+import { Roles } from './decorators/roles.decorator';
+import { RoleGuard } from './guards/role.guard';
 
 @Controller('')
+@UseGuards(RoleGuard)
 export class UserController {
-    constructor(private userService: UserService){}
+    constructor(private readonly userService: UserService){}
 
     @Post('auth/login')
     login(@Body() data: UserDTO){
@@ -20,23 +23,16 @@ export class UserController {
     }
 
     @Get('auth/loggeduser')
-    @UseGuards(new AuthGaurd())
+    @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     getLoguedUser(@Body() data: UserInfoDTO){
         let logguedUser:UserInfoDTO = this.userService.getLoggedUser();
-        if (logguedUser === undefined) {
-            throw new HttpException('User does not exist!', 404);
-        }
         return this.userService.getById(logguedUser.id);
     }
     
     @Put('user/update')
-    @UseGuards(new AuthGaurd())
+    @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async update(@Body() data: Partial<UserInfoDTO>){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
-        if (logguedUser === undefined) {
-            throw new HttpException('User does not exist!', 404);
-        }
-
         return this.userService.update(logguedUser.id, data) ;
     }       
 }
