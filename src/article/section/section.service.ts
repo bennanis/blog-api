@@ -39,6 +39,17 @@ export class SectionService {
         throw new HttpException('create successfully ! ', 200);
     }
 
+    async delete(loggedUserId:number, sectionId: number){
+        let section: SectionEntity = await this.sectionRepository.findOne(sectionId, {relations: ["user"]});
+        if(!section)
+            throw new HttpException('Section not found ! ', 404);
+        if(section.user.id !== loggedUserId)
+            throw new HttpException('Error permissions ', 404)
+        
+        await this.sectionRepository.delete(sectionId);
+        throw new HttpException('Delete successfully ! ', 200);
+    }
+
     async addArticleSection(loggedUserId:number, idSection:number, idArticle:number){
         let section: SectionEntity = await this.sectionRepository.findOne(idSection,  { relations: ["user", "articles"] });
         let article: ArticleEntity = await this.articleRepository.findOne(idArticle);
