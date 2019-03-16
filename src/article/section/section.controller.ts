@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards, Body, HttpException } from '@nestjs/common';
+import { Controller, Post, UseGuards, Body, HttpException, Param } from '@nestjs/common';
 import { ArticleService } from '../article.service';
 import { UserService } from 'src/user/user.service';
 import { SectionService } from './section.service';
@@ -19,6 +19,16 @@ export class SectionController {
             throw new HttpException('User does not exist!', 404);
         }
         return this.sectionService.create(logguedUser.id, sectionData);
+    }
+
+    @Post(':idSection/:idArticle')
+    @UseGuards(new AuthGaurd())
+    async addArticleSection(@Param("idSection") idSection:number, @Param("idArticle") idArticle:number){
+        let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
+        if (logguedUser === undefined) {
+            throw new HttpException('User does not exist!', 404);
+        }
+        return this.sectionService.addArticleSection(logguedUser.id, idSection, idArticle);
     }
 
 }

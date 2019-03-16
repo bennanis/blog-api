@@ -35,8 +35,7 @@ export class ArticleEntity {
     })
     comments: CommentEntity[];
 
-    @ManyToMany(type => SectionEntity)
-    @JoinTable()
+    @ManyToMany(type => SectionEntity, section => section.articles)
     sections: SectionEntity[];
 
     @CreateDateColumn()

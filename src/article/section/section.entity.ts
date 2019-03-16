@@ -15,6 +15,11 @@ export class SectionEntity {
     @ManyToOne(type => UserEntity, user => user.sections)
     user: UserEntity;
 
+
+    @ManyToMany(type => ArticleEntity, artcile => artcile.sections)
+    @JoinTable()
+    articles: ArticleEntity[];
+
     @CreateDateColumn()
     created_at: Date;
 

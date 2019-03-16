@@ -33,5 +33,31 @@ export class SectionService {
         throw new HttpException('create successfully ! ', 200);
     }
 
+    async addArticleSection(loggedUserId:number, idSection:number, idArticle:number){
+        let section: SectionEntity = await this.sectionRepository.findOne(idSection,  { relations: ["user", "articles"] });
+        let article: ArticleEntity = await this.articleRepository.findOne(idArticle);
+
+        if(!section)
+            throw new HttpException('Section not found ! ', 404);
+        if(section.user.id !== loggedUserId)
+            throw new HttpException('Error permissions ', 404)
+        if(!article)
+            throw new HttpException('Article not found ! ', 404);
+
+        // Tout les articles de la rubrique : idSection
+        let articlesInSection: ArticleEntity[] = section.articles;
+        for(let i = 0; i<articlesInSection.length; i++){
+            // Si l'article est déjà présent dans cette rubrique, renvoie erreur
+            if(articlesInSection[i].id == idArticle)
+                throw new HttpException('Error ! ', 404);
+        }
+        this.sectionRepository.createQueryBuilder('')
+        .relation(SectionEntity, "articles")
+        .of(section)
+        .add(article);
+        throw new HttpException('Article added to section ! ', 404);
+
+    }
+
 
 }
