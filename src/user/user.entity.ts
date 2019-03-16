@@ -4,6 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import * as CryptoJS from 'crypto-js';
 import { UserDTO, UserInfoDTO, UserLoginDTO } from "./user.dto";
 import { CommentEntity, ArticleEntity } from "src/article/article.entity";
+import { SectionEntity } from "src/article/section/section.entity";
 
 export enum UserRole {
     ADMIN = "admin",
@@ -64,9 +65,11 @@ export class UserEntity {
     @OneToMany(type => ArticleEntity, articles => articles.author)
     articles: ArticleEntity[];
 
-    // un utilisateur peut avoir plusieurs commentaires
     @OneToMany(type => CommentEntity, comments => comments.author)
     comments: CommentEntity[];
+
+    @OneToMany(type => SectionEntity, sections => sections.user)
+    sections: SectionEntity[];
 
     @CreateDateColumn()
     created_at: Date;
