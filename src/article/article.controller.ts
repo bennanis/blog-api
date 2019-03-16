@@ -100,4 +100,18 @@ export class ArticleController {
         return this.articleService.addCommentComment(logguedUser.id, commentId, data.content) ;
     }
 
+    @Post('/comment/:commentId/:typeLike')
+    @UseGuards(new AuthGaurd())
+    async noteCommentArticle(@Param('commentId') commentId: number, @Param('typeLike') typeLike: string){
+        let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
+        if (logguedUser === undefined) {
+            throw new HttpException('User does not exist!', 404);
+        }
+        if(typeLike == 'like' || typeLike == 'dislikes'){
+            return this.articleService.noteCommentArticle(logguedUser.id, commentId, typeLike) ;
+        } else {
+            throw new HttpException('Erreur', 404);
+        }
+    }
+
 }

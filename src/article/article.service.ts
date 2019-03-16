@@ -169,6 +169,32 @@ export class ArticleService {
             throw new HttpException('Add comment : No permission ! ', 200);
         }
     }
+
+    async noteCommentArticle(loggedUserId:number, commentId: number, typeLike: string)
+    {
+        let user: UserEntity = await this.userRepository.findOne(loggedUserId);
+
+        // Récupérer le commentaire
+        let comment: CommentEntity = await this.commentRepository.findOne(commentId, { relations: ["article"] });
+        if(!comment){throw new HttpException('Comment not found ! ', 404);}
+            
+        // Récupérer l'artcile ou se trouve le commentaire
+        let article: ArticleEntity = await this.articleRepository.findOne(comment.article.id)
+
+        if(article.author.id == loggedUserId){
+            if(typeLike == 'like'){
+                comment.likes = 1;
+                comment.disLikes = 0;
+            } else if(typeLike == 'dislike'){
+                comment.disLikes = 1;
+                comment.likes = 0;
+            }
+            await this.commentRepository.update(commentId, comment);
+            throw new HttpException('Comment noted successfully ! ', 200);
+        } else {
+            throw new HttpException('Note comment : No permission ! ', 200);
+        }
+    }
     
 
 }

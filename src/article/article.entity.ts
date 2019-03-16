@@ -94,6 +94,12 @@ export class CommentEntity {
     @JoinColumn({ name: "parent_id" })
     parent_id: CommentEntity;
 
+    @Column({type: "int", default: 0})
+    likes: number;
+
+    @Column({type: "int", default: 0})
+    disLikes: number;
+
     @Column({type: "text", nullable: false})
     content: string;
 
