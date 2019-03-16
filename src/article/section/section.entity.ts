@@ -16,7 +16,9 @@ export class SectionEntity {
     user: UserEntity;
 
 
-    @ManyToMany(type => ArticleEntity, artcile => artcile.sections)
+    @ManyToMany(type => ArticleEntity, artcile => artcile.sections, {
+        eager: true
+    })
     @JoinTable()
     articles: ArticleEntity[];
 

@@ -19,6 +19,12 @@ export class SectionService {
         private userService: UserService
     ) {}
 
+
+    async getAll(loggedUserId:number){
+        let user: UserEntity = await this.userRepository.findOne(loggedUserId);
+        return await this.sectionRepository.findOne({where: {user: user}});
+    }
+
     async create(loggedUserId:number, dataSection:Partial<SectionDTO>)
     {
 
