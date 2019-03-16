@@ -22,13 +22,13 @@ export class UserService {
             return {'success': false, 'info': 'Missing information'}
         
         const {email, password} = data;
-        let user = await this.userRepository.findOne({where: {email}})
+        let user = await this.userRepository.findOne({where: {email}, select: ['id', 'email', 'password', 'first_name', 'last_name', 'avatar', 'type', 'created_at', 'updated_at']})
         if(!user)
             return {'success': false, 'info': 'Wrong email address'}
         else if(!await user.comparePassword(password))
             return {'success': false, 'info': 'Wrong password'}
             
-        this.loggedUser = user.toResponseObject(true); 
+        this.loggedUser = user.toResponseObject(true);
         return user.toResponseObject(true);
     }
 

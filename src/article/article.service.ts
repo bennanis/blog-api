@@ -34,6 +34,10 @@ export class ArticleService {
         throw new HttpException('create successfully ! ', 200);
     }
 
+    async getById(articleId:number){
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId);
+        return article;
+    }
 
     async update(loggedUserId: number, articleId: number, articleData: Partial<ArticleDTO>)
     {
@@ -116,15 +120,8 @@ export class ArticleService {
 
     async deleteCommentArticle(loggedUserId:number, commentId: number)
     {
-        let comment: CommentEntity = await this.commentRepository.findOne(commentId);
-        if(!comment){throw new HttpException('Comment not found ! ', 404);}
+     //TO FIX
 
-        if(comment.author.id == loggedUserId){
-            await this.commentRepository.delete(commentId);
-            throw new HttpException('Delete successfully ! ', 200);
-        } else {
-            throw new HttpException('Delete : No permission ! ', 200);
-        }
     }
 
     

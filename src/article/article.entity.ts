@@ -29,7 +29,9 @@ export class ArticleEntity {
     })
     author: UserEntity;
 
-    @OneToMany(type => CommentEntity, comments => comments.author)
+    @OneToMany(type => CommentEntity, comment => comment.article, {
+        eager: true
+    })
     comments: CommentEntity[];
 
     @CreateDateColumn()
@@ -79,15 +81,13 @@ export class CommentEntity {
     id: number;
 
     // plusieurs commentaires peuvent être posséder par un utilisateur
-    @ManyToOne(type => UserEntity, author => author.comments, {
-        eager: true
-    })
+    @ManyToOne(type => UserEntity, author => author.comments)
+    @JoinColumn({ name: "user_id" })
     author: UserEntity;
 
     // plusieurs commentaires peuvent être posséder par un article
-    @ManyToOne(type => ArticleEntity, article => article.comments, {
-        eager: true
-    })
+    @ManyToOne(type => ArticleEntity, article => article.comments)
+    @JoinColumn({ name: "article_id" })
     article: UserEntity;    
 
     @Column({type: "text", nullable: false})

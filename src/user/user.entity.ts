@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert, UpdateDateColumn, Any, OneToMany, } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert, UpdateDateColumn, Any, OneToMany, JoinColumn, } from "typeorm";
 
 import * as jwt from 'jsonwebtoken';
 import * as CryptoJS from 'crypto-js';
@@ -17,6 +17,7 @@ export class UserEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
+
     @Column({    
         type: "varchar",
         length: "255",
@@ -25,6 +26,7 @@ export class UserEntity {
 
     @Column({    
         type: "varchar",
+        select: false,
         length: "255",})
     password: string;
 
@@ -86,7 +88,7 @@ export class UserEntity {
         else
             return false;
     }
-
+    
     toResponseObject(showToken = false) {
         const {id, email, avatar, first_name, last_name, created_at, is_author, type, updated_at, token} = this;
         if(showToken){
