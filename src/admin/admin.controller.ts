@@ -2,7 +2,7 @@ import { Controller, UseGuards, Put, Body, Param, HttpException, HttpStatus, Del
 import { RoleGuard } from 'src/user/guards/role.guard';
 import { UserService } from 'src/user/user.service';
 import { Roles } from 'src/user/decorators/roles.decorator';
-import { UserRole } from 'src/user/user.entity';
+import { UserRole, UserEntity } from 'src/user/user.entity';
 import { UserInfoDTO } from 'src/user/user.dto';
 import { AdminService } from './admin.service';
 import { async } from 'rxjs/internal/scheduler/async';
@@ -40,7 +40,13 @@ export class AdminController {
         return this.adminService.getUserById(userId);
     }
 
-    
+    @Put('user/:userId/changeRole/:type')
+    @Roles(UserRole.ADMIN)
+    async changeUserType(@Param('userId') userId:number, @Param('type') type:string){
+        let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
+
+        return this.adminService.changeUserType(logguedUser.id, userId, type);
+    }
     
     @Delete('user/:userId')
     @Roles(UserRole.ADMIN)

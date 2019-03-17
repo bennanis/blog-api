@@ -75,4 +75,33 @@ export class AdminService {
         .getMany();
     }
 
+    async changeUserType(logguedUserId:number,userId: number,type:string){
+        let user = await this.userRepository.findOne(userId);
+        if (!user)
+            throw new HttpException('User does not exist!', HttpStatus.NOT_FOUND);
+
+        if((user.type == UserRole.ADMIN) && (user.id !== logguedUserId))
+            throw new HttpException('Not allowed !', HttpStatus.UNAUTHORIZED);
+
+        switch(type){
+            case "standard":
+                user.type = UserRole.STANDARD;
+                break;
+            case "author":
+                user.type = UserRole.AUTHOR;
+                break;
+            case "admin":
+                user.type = UserRole.ADMIN;
+                break;
+            default:
+                throw new HttpException('Error update role !', HttpStatus.BAD_REQUEST);
+
+        }
+  
+        await this.userRepository.update(userId, user);
+
+        throw new HttpException('Success update !', HttpStatus.CREATED);
+
+    }
+
 }
