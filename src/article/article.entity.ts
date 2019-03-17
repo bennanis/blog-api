@@ -26,12 +26,13 @@ export class ArticleEntity {
     picture: string;
 
     @ManyToOne(type => UserEntity, user => user.articles, {
-        eager: true
+        eager: true,
+        onDelete: "SET NULL"
     })
     author: UserEntity;
 
     @OneToMany(type => CommentEntity, comment => comment.article, {
-        eager: true
+        eager: true,
     })
     comments: CommentEntity[];
 
@@ -85,7 +86,9 @@ export class CommentEntity {
     id: number;
 
     // plusieurs commentaires peuvent être posséder par un utilisateur
-    @ManyToOne(type => UserEntity, author => author.comments)
+    @ManyToOne(type => UserEntity, author => author.comments, {
+        onDelete: "SET NULL"
+    })
     @JoinColumn({ name: "user_id" })
     author: UserEntity;
 

@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Put, Body, Param, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, UseGuards, Put, Body, Param, HttpException, HttpStatus, Delete } from '@nestjs/common';
 import { RoleGuard } from 'src/user/guards/role.guard';
 import { UserService } from 'src/user/user.service';
 import { Roles } from 'src/user/decorators/roles.decorator';
@@ -25,5 +25,11 @@ export class AdminController {
     @Roles(UserRole.ADMIN)
     async disabledUser(@Param('userId') userId:number){
         return this.adminService.disabledUser(userId) ;
+    }
+    
+    @Delete('user/:userId')
+    @Roles(UserRole.ADMIN)
+    async deleteUser(@Param('userId') userId:number){
+        return this.adminService.deleteUser(userId) ;
     }   
 }

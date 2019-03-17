@@ -36,12 +36,29 @@ export class AdminService {
         if (!user) {
             throw new HttpException('User does not exist!', HttpStatus.NOT_FOUND);
         }
-
+        if(user.type == UserRole.ADMIN)
+            throw new HttpException('Not allowed !', HttpStatus.UNAUTHORIZED);
 
         user.active = false;
         await this.userRepository.update(userId, user);
 
         throw new HttpException('disabled successfully !', HttpStatus.CREATED);
     }
+
+    async deleteUser(userId:number)
+    {
+        let user = await this.userRepository.findOne(userId);
+        if (!user)
+            throw new HttpException('User does not exist!', HttpStatus.NOT_FOUND);
+
+        if(user.type == UserRole.ADMIN)
+            throw new HttpException('Not allowed !', HttpStatus.UNAUTHORIZED);
+
+        await this.userRepository.delete(userId);
+        
+        throw new HttpException('Deleted successfully !', HttpStatus.CREATED);
+    }
+
+    
 
 }

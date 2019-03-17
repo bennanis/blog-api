@@ -12,7 +12,9 @@ export class SectionEntity {
     @Column({type: "varchar", length: "255", nullable: false})
     titre: string;
 
-    @ManyToOne(type => UserEntity, user => user.sections)
+    @ManyToOne(type => UserEntity, user => user.sections, {
+        onDelete: "CASCADE"       
+    })
     user: UserEntity;
 
 

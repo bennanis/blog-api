@@ -67,7 +67,7 @@ export class ArticleService {
             throw new HttpException('Article not found ! ', HttpStatus.NOT_FOUND);
         }
 
-        if(article.author.id !== loggedUserId){
+        if((article.author == null) || (article.author.id !== loggedUserId)){
             throw new HttpException('Permission denied ! ', HttpStatus.UNAUTHORIZED);
         }
 
@@ -91,7 +91,7 @@ export class ArticleService {
         if(!article){
             throw new HttpException('Article not found ! ', HttpStatus.NOT_FOUND);
         }
-        if(article.author.id == user.id){
+        if((article.author !== undefined) && (article.author.id == user.id)){
             await this.articleRepository.delete(articleId);
             throw new HttpException('Delete successfully ! ', HttpStatus.OK);
         } else {
@@ -167,6 +167,8 @@ export class ArticleService {
             
         // Récupérer l'artcile ou se trouve le commentaire
         let article: ArticleEntity = await this.articleRepository.findOne(comment.article.id)
+        if(article.author === null)
+            throw new HttpException('Add comment : No permission ! ', HttpStatus.UNAUTHORIZED);
 
         if(article.author.id == loggedUserId){
             let commentAdd = await this.commentRepository.create({author: user, article: article, content: content, parent_id: comment});
