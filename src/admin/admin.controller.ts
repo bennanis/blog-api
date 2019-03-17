@@ -13,7 +13,7 @@ export class AdminController {
 
     @Put('user/:userId/update-email')
     @Roles(UserRole.ADMIN)
-    async update(@Param('userId') userId:number, @Body() data: Partial<UserInfoDTO>){
+    async updateUserEmail(@Param('userId') userId:number, @Body() data: Partial<UserInfoDTO>){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
         if(!data.email)
             throw new HttpException('Email is required', HttpStatus.BAD_REQUEST);
@@ -21,4 +21,9 @@ export class AdminController {
         return this.adminService.updateUserEmail(logguedUser.id, userId, data.email) ;
     }   
 
+    @Put('user/:userId/disabled')
+    @Roles(UserRole.ADMIN)
+    async disabledUser(@Param('userId') userId:number){
+        return this.adminService.disabledUser(userId) ;
+    }   
 }

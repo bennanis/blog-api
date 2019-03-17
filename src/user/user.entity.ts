@@ -48,13 +48,6 @@ export class UserEntity {
     avatar: string;
 
     @Column({
-        name: "is_author",
-        type: "boolean",
-        default: false
-    })
-    is_author: boolean;
-
-    @Column({
         name: "type",
         type: "enum",
         enum: UserRole,
@@ -70,6 +63,12 @@ export class UserEntity {
 
     @OneToMany(type => SectionEntity, sections => sections.user)
     sections: SectionEntity[];
+
+    @Column({    
+        name: "active",
+        type: "boolean",
+        default: true,})
+    active: boolean;
 
     @CreateDateColumn()
     created_at: Date;
@@ -93,12 +92,12 @@ export class UserEntity {
     }
     
     toResponseObject(showToken = false) {
-        const {id, email, avatar, first_name, last_name, created_at, is_author, type, updated_at, token} = this;
+        const {id, email, avatar, first_name, last_name, created_at, active, type, updated_at, token} = this;
         if(showToken){
-            let responseObject:UserLoginDTO = {id, email, first_name, last_name, avatar, is_author, type, created_at, updated_at, token};
+            let responseObject:UserLoginDTO = {id, email, first_name, last_name, avatar, active, type, created_at, updated_at, token};
             return responseObject;  
         }else {
-            let responseObject:UserInfoDTO = {id, email, first_name, last_name, avatar, is_author, type, created_at, updated_at};
+            let responseObject:UserInfoDTO = {id, email, first_name, last_name, avatar, active, type, created_at, updated_at};
             return responseObject;  
         }
     }

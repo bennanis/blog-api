@@ -30,4 +30,18 @@ export class AdminService {
         throw new HttpException('Success update !', HttpStatus.CREATED);
     }
 
+    async disabledUser(userId:number)
+    {
+        let user = await this.userRepository.findOne(userId);
+        if (!user) {
+            throw new HttpException('User does not exist!', HttpStatus.NOT_FOUND);
+        }
+
+
+        user.active = false;
+        await this.userRepository.update(userId, user);
+
+        throw new HttpException('disabled successfully !', HttpStatus.CREATED);
+    }
+
 }

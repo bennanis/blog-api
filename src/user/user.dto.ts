@@ -9,7 +9,7 @@ export class UserDTO {
     last_name: string;
     avatar: string;
     type: UserRole;
-    is_author: boolean;
+    active: boolean;
     created_at: Date;
     updated_at: Date;
 }
@@ -21,7 +21,7 @@ export class UserInfoDTO {
     last_name: string;
     avatar: string;
     type: UserRole;
-    is_author: boolean;
+    active: boolean;
     created_at: Date;
     updated_at: Date;
 }
@@ -33,7 +33,7 @@ export class UserLoginDTO {
     last_name: string;
     avatar: string;
     type: UserRole;
-    is_author: boolean;
+    active: boolean;
     created_at: Date;
     updated_at: Date;
     token: string;
