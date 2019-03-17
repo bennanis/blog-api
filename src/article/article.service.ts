@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { ArticleDTO, NoteArticleDto } from './article.dto';
 import { UserService } from 'src/user/user.service';
 import { UserInfoDTO } from 'src/user/user.dto';
-import { UserEntity } from 'src/user/user.entity';
+import { UserEntity, UserRole } from 'src/user/user.entity';
 
 @Injectable()
 export class ArticleService {
@@ -35,7 +35,9 @@ export class ArticleService {
     }
 
     async getById(articleId:number){
-        let article: ArticleEntity = await this.articleRepository.findOne(articleId);
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId, {where: {hidden:0}});
+        if(!article)
+            throw new HttpException('Article not found ! ', HttpStatus.NOT_FOUND);
         return article;
     }
 
@@ -45,6 +47,7 @@ export class ArticleService {
       return await this.articleRepository.createQueryBuilder("article")
         .select(["article.id", "article.titre", "article.created_at"])
         .leftJoinAndSelect("article.author", "user")
+        .where({hidden: 0})
         .offset(offset)
         .limit(limit)
         .orderBy("article.created_at", "DESC")
@@ -54,9 +57,25 @@ export class ArticleService {
     async getAllMine(loggedUserId: number){
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
         return await this.articleRepository.createQueryBuilder("article")
-        .where({author: user})
+        .where({author: user, hidden: 0})
         .orderBy("article.created_at", "DESC")
         .getMany();
+    }
+
+    async getAllHidden(loggedUserId: number){
+        let user: UserEntity = await this.userRepository.findOne(loggedUserId);
+
+        if(user.type == UserRole.ADMIN){
+            return await this.articleRepository.createQueryBuilder("article")
+                .where({hidden: 1})
+                .orderBy("article.created_at", "DESC")
+                .getMany();
+        }
+
+        return await this.articleRepository.createQueryBuilder("article")
+            .where({author: user, hidden: 1})
+            .orderBy("article.created_at", "DESC")
+            .getMany();
     }
 
     async update(loggedUserId: number, articleId: number, articleData: Partial<ArticleDTO>)

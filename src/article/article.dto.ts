@@ -10,6 +10,7 @@ export class ArticleDTO {
     disLikes: number;
     picture: string;
     author: UserEntity;
+    hidden: boolean;
     created_at: Date;
     updated_at: Date;
 }
