@@ -68,4 +68,11 @@ export class AdminService {
         return user;
     }
 
+    async getAllUser(){
+        return await this.userRepository.createQueryBuilder("user")
+        .select(["user.id", "user.first_name", "user.last_name", "user.type"])
+        .orderBy("user.created_at", "DESC")
+        .getMany();
+    }
+
 }

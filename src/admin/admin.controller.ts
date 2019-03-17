@@ -28,11 +28,19 @@ export class AdminController {
         return this.adminService.disabledUser(userId) ;
     }
 
+    @Get('user/all')
+    @Roles(UserRole.ADMIN)
+    async getAllUser(){
+        return this.adminService.getAllUser();
+    }
+
     @Get('user/:userId')
     @Roles(UserRole.ADMIN)
     async getUserById(@Param('userId') userId:number){
         return this.adminService.getUserById(userId);
     }
+
+    
     
     @Delete('user/:userId')
     @Roles(UserRole.ADMIN)
