@@ -199,7 +199,7 @@ export class ArticleService {
             await this.commentRepository.update(commentId, comment);
             throw new HttpException('Comment noted successfully ! ', HttpStatus.OK);
         } else {
-            throw new HttpException('Note comment : No permission ! ', HttpStatus.UNAUTHORIZED);
+            throw new HttpException('No permission ! ', HttpStatus.UNAUTHORIZED);
         }
     }
     

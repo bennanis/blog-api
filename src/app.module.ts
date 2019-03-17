@@ -7,10 +7,11 @@ import { UserModule } from './user/user.module';
 import { ArticleModule } from './article/article.module';
 import { ArticleController } from './article/article.controller';
 import { ArticleService } from './article/article.service';
+import { AdminModule } from './admin/admin.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), UserModule, ArticleModule],
+  imports: [TypeOrmModule.forRoot(), UserModule, ArticleModule, AdminModule],
   controllers: [],
   providers: [UserService]
 })
