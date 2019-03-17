@@ -25,6 +25,8 @@
     "@nestjs/swagger": "^2.5.1",
     "@nestjs/typeorm": "^5.2.2",
     "@types/crypto-js": "^3.1.43",
+    "bcrypt": "^3.0.4",
+    "jsonwebtoken": "^8.5.0",
     "mysql": "^2.16.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
