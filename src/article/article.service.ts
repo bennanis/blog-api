@@ -24,14 +24,14 @@ export class ArticleService {
     async create(loggedUserId:number, data: ArticleDTO)
     {
         if(!data.titre || !data.content)
-            throw new HttpException('Missing information !', 404);
+            throw new HttpException('Missing information !', HttpStatus.BAD_REQUEST);
 
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
         data.author = user;
         let article = await this.articleRepository.create(data);
         await this.articleRepository.save(article);
 
-        throw new HttpException('create successfully ! ', 200);
+        throw new HttpException('create successfully ! ', HttpStatus.CREATED);
     }
 
     async getById(articleId:number){

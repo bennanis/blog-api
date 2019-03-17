@@ -1,4 +1,4 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArticleEntity } from '../article.entity';
 import { UserEntity } from 'src/user/user.entity';
@@ -30,24 +30,24 @@ export class SectionService {
 
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
         if(!dataSection.titre){
-            throw new HttpException('Error ! ', 404);
+            throw new HttpException('Missing information !', HttpStatus.BAD_REQUEST);
         }
         dataSection.user = user;
         let section = await this.sectionRepository.create(dataSection);
         await this.sectionRepository.save(section);
 
-        throw new HttpException('create successfully ! ', 200);
+        throw new HttpException('create successfully ! ', HttpStatus.CREATED);
     }
 
     async delete(loggedUserId:number, sectionId: number){
         let section: SectionEntity = await this.sectionRepository.findOne(sectionId, {relations: ["user"]});
         if(!section)
-            throw new HttpException('Section not found ! ', 404);
+            throw new HttpException('Section not found ! ', HttpStatus.BAD_REQUEST);
         if(section.user.id !== loggedUserId)
-            throw new HttpException('Error permissions ', 404)
+            throw new HttpException('You are not authorized to perform this action. ', HttpStatus.UNAUTHORIZED)
         
         await this.sectionRepository.delete(sectionId);
-        throw new HttpException('Delete successfully ! ', 200);
+        throw new HttpException('Delete successfully ! ', HttpStatus.OK);
     }
 
     async addArticleSection(loggedUserId:number, idSection:number, idArticle:number){
@@ -55,11 +55,11 @@ export class SectionService {
         let article: ArticleEntity = await this.articleRepository.findOne(idArticle);
 
         if(!section)
-            throw new HttpException('Section not found ! ', 404);
+            throw new HttpException('Section not found ! ', HttpStatus.BAD_REQUEST);
         if(section.user.id !== loggedUserId)
-            throw new HttpException('Error permissions ', 404)
+            throw new HttpException('You are not authorized to perform this action. ', HttpStatus.UNAUTHORIZED)
         if(!article)
-            throw new HttpException('Article not found ! ', 404);
+            throw new HttpException('Article not found ! ', HttpStatus.BAD_REQUEST);
 
         // Tout les articles de la rubrique : idSection
         let articlesInSection: ArticleEntity[] = section.articles;
@@ -72,7 +72,7 @@ export class SectionService {
         .relation(SectionEntity, "articles")
         .of(section)
         .add(article);
-        throw new HttpException('Article added to section ! ', 404);
+        throw new HttpException('Article added to section ! ', HttpStatus.CREATED);
 
     }
 
