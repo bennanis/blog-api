@@ -42,6 +42,12 @@ export class ArticleController {
         return this.articleService.showHideArticle(articleId, "hide") ;
     }
 
+    @Put('/:articleId/show')
+    @Roles(UserRole.AUTHOR)
+    async showArticle(@Param('articleId') articleId: number){
+        return this.articleService.showHideArticle(articleId, "show") ;
+    }
+
     @Get(':articleId')
     async getById(@Param('articleId') articleId:number){
         return this.articleService.getById(articleId);
