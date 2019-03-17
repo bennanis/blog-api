@@ -95,15 +95,17 @@ export class ArticleService {
 
     async update(loggedUserId: number, articleId: number, articleData: Partial<ArticleDTO>)
     {
-        let article: ArticleEntity = await this.articleRepository.findOne(articleId);
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId, {relations: ["author"]});
 
-        if(!article){
+        if(!article)
             throw new HttpException('Article not found ! ', HttpStatus.NOT_FOUND);
-        }
 
-        if((article.author == null) || (article.author.id !== loggedUserId)){
+        
+        if((article.author == null) )
             throw new HttpException('Permission denied ! ', HttpStatus.UNAUTHORIZED);
-        }
+      
+        if(article.author.id !== loggedUserId)
+            throw new HttpException('Permission denied ! ', HttpStatus.UNAUTHORIZED);
 
         if(articleData.content)
             article.content = articleData.content;
@@ -119,7 +121,7 @@ export class ArticleService {
 
     async delete(loggedUserId:number, articleId: number)
     {
-        let article: ArticleEntity = await this.articleRepository.findOne(articleId);
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId, {relations: ["author"]});
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
 
         if(!article){
@@ -135,7 +137,7 @@ export class ArticleService {
 
     async noteArticle(loggedUserId:number, articleId: number, grade: number)
     {
-        let article: ArticleEntity = await this.articleRepository.findOne(articleId);
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId, {relations: ["author"]});
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
 
         if(!article){throw new HttpException('Article not found ! ', HttpStatus.NOT_FOUND);}
@@ -206,7 +208,7 @@ export class ArticleService {
         if(hasParent){throw new HttpException('You can not add more than one comment ! ', HttpStatus.UNAUTHORIZED);}
             
         // Récupérer l'artcile ou se trouve le commentaire
-        let article: ArticleEntity = await this.articleRepository.findOne(comment.article.id)
+        let article: ArticleEntity = await this.articleRepository.findOne(comment.article.id, {relations: ["author"]})
         if(article.author === null)
             throw new HttpException('Add comment : No permission ! ', HttpStatus.UNAUTHORIZED);
 
@@ -228,7 +230,7 @@ export class ArticleService {
         if(!comment){throw new HttpException('Comment not found ! ', HttpStatus.NOT_FOUND);}
             
         // Récupérer l'artcile ou se trouve le commentaire
-        let article: ArticleEntity = await this.articleRepository.findOne(comment.article.id)
+        let article: ArticleEntity = await this.articleRepository.findOne(comment.article.id, {relations: ["author"]})
 
         if(article.author.id == loggedUserId){
             if(typeLike == 'like'){
