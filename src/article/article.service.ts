@@ -35,7 +35,7 @@ export class ArticleService {
     }
 
     async getById(articleId:number){
-        let article: ArticleEntity = await this.articleRepository.findOne(articleId);
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId, {relations: ["author", "comments"]});
         return article;
     }
 
@@ -45,6 +45,7 @@ export class ArticleService {
       return await this.articleRepository.createQueryBuilder("article")
         .select(["article.id", "article.titre", "article.created_at"])
         .leftJoinAndSelect("article.author", "user")
+        .leftJoinAndSelect("article.comments", "comments")
         .offset(offset)
         .limit(limit)
         .orderBy("article.created_at", "DESC")
@@ -54,6 +55,7 @@ export class ArticleService {
     async getAllMine(loggedUserId: number){
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
         return await this.articleRepository.createQueryBuilder("article")
+        .leftJoinAndSelect("article.comments", "comments")
         .where({author: user})
         .orderBy("article.created_at", "DESC")
         .getMany();

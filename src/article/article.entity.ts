@@ -26,14 +26,11 @@ export class ArticleEntity {
     picture: string;
 
     @ManyToOne(type => UserEntity, user => user.articles, {
-        eager: true,
         onDelete: "SET NULL"
     })
     author: UserEntity;
 
-    @OneToMany(type => CommentEntity, comment => comment.article, {
-        eager: true,
-    })
+    @OneToMany(type => CommentEntity, comment => comment.article)
     comments: CommentEntity[];
 
     @ManyToMany(type => SectionEntity, section => section.articles)

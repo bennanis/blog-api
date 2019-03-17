@@ -59,6 +59,13 @@ export class AdminService {
         throw new HttpException('Deleted successfully !', HttpStatus.CREATED);
     }
 
-    
+    async getUserById(userId: number)
+    {
+        let user = await this.userRepository.findOne(userId, {relations: ["articles", "comments", "sections"]});
+        if (!user) {
+            throw new HttpException('User does not exist!', HttpStatus.NOT_FOUND);
+        }
+        return user;
+    }
 
 }
