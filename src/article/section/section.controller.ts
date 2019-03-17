@@ -8,6 +8,7 @@ import { SectionDTO } from './section.dto';
 import { UserRole } from 'src/user/user.entity';
 import { Roles } from 'src/user/decorators/roles.decorator';
 import { RoleGuard } from 'src/user/guards/role.guard';
+import { ApiUseTags } from '@nestjs/swagger';
 
 @Controller('section')
 @UseGuards(RoleGuard)
@@ -16,6 +17,7 @@ export class SectionController {
         private sectionService: SectionService){}
 
     @Post()
+    @ApiUseTags('Section article')
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async create(@Body() sectionData: Partial<SectionDTO>){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -23,6 +25,7 @@ export class SectionController {
     }
 
     @Delete(':idSection')
+    @ApiUseTags('Section article')
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async delete(@Param("idSection") idSection:number){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -30,6 +33,7 @@ export class SectionController {
     }
 
     @Post(':idSection/:idArticle')
+    @ApiUseTags('Section article')
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async addArticleSection(@Param("idSection") idSection:number, @Param("idArticle") idArticle:number){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -37,6 +41,7 @@ export class SectionController {
     }
 
     @Get('/all')
+    @ApiUseTags('Section article')
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async getAll(){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();

@@ -9,6 +9,7 @@ import { async } from 'rxjs/internal/scheduler/async';
 import { RoleGuard } from 'src/user/guards/role.guard';
 import { UserRole } from 'src/user/user.entity';
 import { Roles } from 'src/user/decorators/roles.decorator';
+import { ApiUseTags, ApiResponse } from '@nestjs/swagger';
 
 @Controller('article')
 @UseGuards(RoleGuard)
@@ -17,6 +18,8 @@ export class ArticleController {
 
     @Post()
     @Roles(UserRole.AUTHOR)
+    @ApiUseTags('article')
+    @ApiResponse({ status: 401, description: 'Cette requête nécessite des droits plus élevés.' })
     async create(@Body() articleData: ArticleDTO){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
         return this.articleService.create(logguedUser.id, articleData);
@@ -24,12 +27,14 @@ export class ArticleController {
 
     @Get('/allMine')
     @Roles(UserRole.AUTHOR)
+    @ApiUseTags('article')
     async getAllMine(){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
         return await this.articleService.getAllMine(logguedUser.id);
     }
 
     @Get('/allHidden')
+    @ApiUseTags('article')
     @Roles(UserRole.AUTHOR, UserRole.ADMIN)
     async getAllHidden(){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -37,29 +42,34 @@ export class ArticleController {
     }
 
     @Put('/:articleId/hide')
+    @ApiUseTags('article')
     @Roles(UserRole.AUTHOR)
     async hideArticle(@Param('articleId') articleId: number){
         return this.articleService.showHideArticle(articleId, "hide") ;
     }
 
     @Put('/:articleId/show')
+    @ApiUseTags('article')
     @Roles(UserRole.AUTHOR)
     async showArticle(@Param('articleId') articleId: number){
         return this.articleService.showHideArticle(articleId, "show") ;
     }
 
     @Get(':articleId')
+    @ApiUseTags('article')
     async getById(@Param('articleId') articleId:number){
         return this.articleService.getById(articleId);
     }
 
     @Get('/all/:offset')
+    @ApiUseTags('article')
     async getAll(@Param('offset') offset:number){
         return await this.articleService.getAll(offset);
     }
 
     
     @Put(':articleId')
+    @ApiUseTags('article')
     @Roles(UserRole.AUTHOR)
     async update(@Param('articleId') articleId: number, @Body() articleData: Partial<ArticleDTO>){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -67,6 +77,7 @@ export class ArticleController {
     }  
 
     @Delete(':articleId')
+    @ApiUseTags('article')
     @Roles(UserRole.AUTHOR)
     async delete(@Param('articleId') articleId: number){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -74,6 +85,7 @@ export class ArticleController {
     }
     
     @Post(':articleId/note')
+    @ApiUseTags('Notation article')
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async noteArticle(@Param('articleId') articleId: number, @Body() data: NoteArticleDto){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -85,6 +97,7 @@ export class ArticleController {
     }
 
     @Post(':articleId/comment')
+    @ApiUseTags('Commentaire article')
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async addCommentArticle(@Param('articleId') articleId: number, @Body() data: any){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -92,6 +105,7 @@ export class ArticleController {
     }
 
     @Delete('/comment/:commentId')
+    @ApiUseTags('Commentaire article')
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async deleteCommentArticle(@Param('commentId') commentId: number){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -99,6 +113,7 @@ export class ArticleController {
     }
 
     @Post('/comment/:commentId')
+    @ApiUseTags('Commentaire article')
     @Roles(UserRole.AUTHOR)
     async addCommentComment(@Param('commentId') commentId: number, @Body() data: any){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -106,6 +121,7 @@ export class ArticleController {
     }
 
     @Post('/comment/:commentId/:typeLike')
+    @ApiUseTags('Commentaire article')
     @Roles(UserRole.AUTHOR)
     async noteCommentArticle(@Param('commentId') commentId: number, @Param('typeLike') typeLike: string){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
