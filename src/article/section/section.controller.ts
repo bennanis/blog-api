@@ -8,7 +8,7 @@ import { SectionDTO } from './section.dto';
 import { UserRole } from 'src/user/user.entity';
 import { Roles } from 'src/user/decorators/roles.decorator';
 import { RoleGuard } from 'src/user/guards/role.guard';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiUseTags, ApiImplicitParam, ApiImplicitBody } from '@nestjs/swagger';
 
 @Controller('section')
 @UseGuards(RoleGuard)
@@ -18,6 +18,7 @@ export class SectionController {
 
     @Post()
     @ApiUseTags('Section article')
+    @ApiImplicitBody({ name: "sectionData", required: true, type: SectionDTO})
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async create(@Body() sectionData: Partial<SectionDTO>){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -26,6 +27,8 @@ export class SectionController {
 
     @Delete(':idSection')
     @ApiUseTags('Section article')
+    @ApiImplicitParam({ name: "idSection", description: "Id de la rubrique qu'on veut supprimer."})
+    
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async delete(@Param("idSection") idSection:number){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -34,6 +37,8 @@ export class SectionController {
 
     @Post(':idSection/:idArticle')
     @ApiUseTags('Section article')
+    @ApiImplicitParam({ name: "idSection", description: "Id de la rubrique dans la quelle on veut ajouter l'article."})
+    @ApiImplicitParam({ name: "idArticle", description: "Id de l'artcile qu'on veut ajouter la rubrique."})
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async addArticleSection(@Param("idSection") idSection:number, @Param("idArticle") idArticle:number){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();

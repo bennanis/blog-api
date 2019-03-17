@@ -6,7 +6,7 @@ import { UserRole, UserEntity } from 'src/user/user.entity';
 import { UserInfoDTO } from 'src/user/user.dto';
 import { AdminService } from './admin.service';
 import { async } from 'rxjs/internal/scheduler/async';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiUseTags, ApiImplicitParam, ApiImplicitBody } from '@nestjs/swagger';
 
 @Controller('admin')
 @UseGuards(RoleGuard)
@@ -15,17 +15,19 @@ export class AdminController {
 
     @Put('user/:userId/update-email')
     @ApiUseTags('admin')
+    @ApiImplicitBody({ name: "emailData", required: true, type: UserInfoDTO})
     @Roles(UserRole.ADMIN)
-    async updateUserEmail(@Param('userId') userId:number, @Body() data: Partial<UserInfoDTO>){
+    async updateUserEmail(@Param('userId') userId:number, @Body() emailData: Partial<UserInfoDTO>){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
-        if(!data.email)
+        if(!emailData.email)
             throw new HttpException('Email is required', HttpStatus.BAD_REQUEST);
  
-        return this.adminService.updateUserEmail(logguedUser.id, userId, data.email) ;
+        return this.adminService.updateUserEmail(logguedUser.id, userId, emailData.email) ;
     }   
 
     @Put('user/:userId/disabled')
     @ApiUseTags('admin')
+    @ApiImplicitParam({ name: "userId", description: "Id l'utilisateur qu'on veut désactiver."})
     @Roles(UserRole.ADMIN)
     async disabledUser(@Param('userId') userId:number){
         return this.adminService.disabledUser(userId) ;
@@ -41,6 +43,7 @@ export class AdminController {
 
     @Get('user/:userId')
     @ApiUseTags('admin')
+    @ApiImplicitParam({ name: "userId", description: "Id l'utilisateur qu'on veut récupérer."})
     @Roles(UserRole.ADMIN)
     async getUserById(@Param('userId') userId:number){
         return this.adminService.getUserById(userId);
@@ -48,6 +51,8 @@ export class AdminController {
 
     @Put('user/:userId/changeRole/:type')
     @ApiUseTags('admin')
+    @ApiImplicitParam({ name: "userId", description: "Id l'utilisateur pour qui on veut changer de role(type)."})
+    @ApiImplicitParam({ name: "type", description: "Le nouveau role de l'utilisateur (standard | author | admin)."})
     @Roles(UserRole.ADMIN)
     async changeUserType(@Param('userId') userId:number, @Param('type') type:string){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -57,6 +62,7 @@ export class AdminController {
     
     @Delete('user/:userId')
     @ApiUseTags('admin')
+    @ApiImplicitParam({ name: "userId", description: "Id l'utilisateur qu'on veut supprimer."})
     @Roles(UserRole.ADMIN)
     async deleteUser(@Param('userId') userId:number){
         return this.adminService.deleteUser(userId) ;

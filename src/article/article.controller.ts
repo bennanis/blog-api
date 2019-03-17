@@ -1,6 +1,6 @@
 import { Controller, Post, Body, HttpException, UseGuards, Put, Param, Delete, Get, Query, Guard } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
-import { ArticleDTO, NoteArticleDto } from './article.dto';
+import { ArticleDTO, NoteArticleDto, CommentDto } from './article.dto';
 import { ArticleService } from './article.service';
 import { UserInfoDTO } from 'src/user/user.dto';
 import { AuthGaurd } from 'src/user/guards/auth.gaurd';
@@ -9,7 +9,7 @@ import { async } from 'rxjs/internal/scheduler/async';
 import { RoleGuard } from 'src/user/guards/role.guard';
 import { UserRole } from 'src/user/user.entity';
 import { Roles } from 'src/user/decorators/roles.decorator';
-import { ApiUseTags, ApiResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiResponse, ApiImplicitBody, ApiBearerAuth, ApiImplicitParam } from '@nestjs/swagger';
 
 @Controller('article')
 @UseGuards(RoleGuard)
@@ -19,7 +19,6 @@ export class ArticleController {
     @Post()
     @Roles(UserRole.AUTHOR)
     @ApiUseTags('article')
-    @ApiResponse({ status: 401, description: 'Cette requête nécessite des droits plus élevés.' })
     async create(@Body() articleData: ArticleDTO){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
         return this.articleService.create(logguedUser.id, articleData);
@@ -43,6 +42,7 @@ export class ArticleController {
 
     @Put('/:articleId/hide')
     @ApiUseTags('article')
+    @ApiImplicitParam({ name: "articleId", description: "Id de l'article qu'on veut cacher."})
     @Roles(UserRole.AUTHOR)
     async hideArticle(@Param('articleId') articleId: number){
         return this.articleService.showHideArticle(articleId, "hide") ;
@@ -50,6 +50,7 @@ export class ArticleController {
 
     @Put('/:articleId/show')
     @ApiUseTags('article')
+    @ApiImplicitParam({ name: "articleId", description: "Id de l'article qu'on veut afficher."})
     @Roles(UserRole.AUTHOR)
     async showArticle(@Param('articleId') articleId: number){
         return this.articleService.showHideArticle(articleId, "show") ;
@@ -57,12 +58,14 @@ export class ArticleController {
 
     @Get(':articleId')
     @ApiUseTags('article')
+    @ApiImplicitParam({ name: "articleId", description: "Id de l'article qu'on veut récupérer."})
     async getById(@Param('articleId') articleId:number){
         return this.articleService.getById(articleId);
     }
 
     @Get('/all/:offset')
     @ApiUseTags('article')
+    @ApiImplicitParam({ name: "offset", description: "Nombre de décallage sur le résultat (Limit +=20)."})
     async getAll(@Param('offset') offset:number){
         return await this.articleService.getAll(offset);
     }
@@ -70,6 +73,8 @@ export class ArticleController {
     
     @Put(':articleId')
     @ApiUseTags('article')
+    @ApiImplicitBody({ name: "articleData", required: true, type: ArticleDTO})
+    @ApiImplicitParam({ name: "articleId", description: "Id de l'article à mettre à jour."})
     @Roles(UserRole.AUTHOR)
     async update(@Param('articleId') articleId: number, @Body() articleData: Partial<ArticleDTO>){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -78,12 +83,14 @@ export class ArticleController {
 
     @Delete(':articleId')
     @ApiUseTags('article')
+    @ApiImplicitParam({ name: "articleId", description: "Id de l'article à supprimer."})
     @Roles(UserRole.AUTHOR)
     async delete(@Param('articleId') articleId: number){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
         return this.articleService.delete(logguedUser.id, articleId) ;
     }
     
+    /* */
     @Post(':articleId/note')
     @ApiUseTags('Notation article')
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
@@ -96,16 +103,20 @@ export class ArticleController {
         return this.articleService.noteArticle(logguedUser.id, articleId, data.grade) ;
     }
 
+    /* */
+
     @Post(':articleId/comment')
     @ApiUseTags('Commentaire article')
+    @ApiImplicitParam({ name: "articleId", description: "Id de l'article dans le quel on veut rajouter le commentaire."})
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
-    async addCommentArticle(@Param('articleId') articleId: number, @Body() data: any){
+    async addCommentArticle(@Param('articleId') articleId: number, @Body() commentData: CommentDto){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
-        return this.articleService.addCommentArticle(logguedUser.id, articleId, data.content);
+        return this.articleService.addCommentArticle(logguedUser.id, articleId, commentData);
     }
 
     @Delete('/comment/:commentId')
     @ApiUseTags('Commentaire article')
+    @ApiImplicitParam({ name: "commentId", description: "Id du commentaire qu'on veut supprimer."})
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
     async deleteCommentArticle(@Param('commentId') commentId: number){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
@@ -114,22 +125,25 @@ export class ArticleController {
 
     @Post('/comment/:commentId')
     @ApiUseTags('Commentaire article')
+    @ApiImplicitParam({ name: "commentId", description: "Id du commentaire que l'auteur veut commenter."})
     @Roles(UserRole.AUTHOR)
-    async addCommentComment(@Param('commentId') commentId: number, @Body() data: any){
+    async addCommentComment(@Param('commentId') commentId: number, @Body() commentData: CommentDto){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
-        return this.articleService.addCommentComment(logguedUser.id, commentId, data.content) ;
+        return this.articleService.addCommentComment(logguedUser.id, commentId, commentData) ;
     }
 
     @Post('/comment/:commentId/:typeLike')
     @ApiUseTags('Commentaire article')
+    @ApiImplicitParam({ name: "commentId", description: "Id du commentaire que l'auteur veut noter."})
+    @ApiImplicitParam({ name: "typeLike", description: "Type de notation : 'like' | 'dislike'."})
     @Roles(UserRole.AUTHOR)
     async noteCommentArticle(@Param('commentId') commentId: number, @Param('typeLike') typeLike: string){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
 
-        if(typeLike == 'like' || typeLike == 'dislikes'){
+        if(typeLike == 'like' || typeLike == 'dislike'){
             return this.articleService.noteCommentArticle(logguedUser.id, commentId, typeLike) ;
         } else {
-            throw new HttpException('Erreur', 404);
+            throw new HttpException('Missing information !', 404);
         }
     }
 

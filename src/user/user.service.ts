@@ -2,7 +2,7 @@ import { Injectable, Req, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
-import { UserDTO, UserInfoDTO } from './user.dto';
+import { UserDTO, UserInfoDTO, UserLoginDTO } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -16,21 +16,21 @@ export class UserService {
         return this.loggedUser
     }
 
-    async login(data: UserDTO)
+    async login(data: UserLoginDTO)
     {
         if(!data.email || !data.password)
-            throw new HttpException('Email and password are required', HttpStatus.BAD_REQUEST);
+            throw new HttpException('Email address and password are required.', HttpStatus.BAD_REQUEST);
         
         const {email, password} = data;
         let user = await this.userRepository.findOne({where: {email}, select: ['id', 'email', 'password', 'first_name', 'last_name', 'avatar', 'active', 'type', 'created_at', 'updated_at']})
         if(!user)
-            throw new HttpException('Wrong email address', HttpStatus.BAD_REQUEST);
+            throw new HttpException('The email address is not valid.', HttpStatus.BAD_REQUEST);
 
         if(!user.active)
-            throw new HttpException('account disabled', HttpStatus.BAD_REQUEST);
+            throw new HttpException('Account is disabled.', HttpStatus.BAD_REQUEST);
 
         if(!await user.comparePassword(password))
-            throw new HttpException('Wrong password', HttpStatus.BAD_REQUEST);
+            throw new HttpException('The password is not valid.', HttpStatus.BAD_REQUEST);
             
         this.loggedUser = user.toResponseObject(true);
         return user.toResponseObject(true);
@@ -55,7 +55,6 @@ export class UserService {
 
         throw new HttpException('Successful registration !', HttpStatus.CREATED);
     }
-
 
     getById(userId: number): Promise<UserInfoDTO>
     {

@@ -6,38 +6,26 @@ import { request } from 'https';
 import { UserEntity, UserRole } from './user.entity';
 import { Roles } from './decorators/roles.decorator';
 import { RoleGuard } from './guards/role.guard';
-import { ApiUseTags } from '@nestjs/swagger';
+import { ApiUseTags, ApiImplicitBody } from '@nestjs/swagger';
 
-@Controller('')
+@Controller('user')
+@ApiUseTags('user')
 @UseGuards(RoleGuard)
 export class UserController {
     constructor(private readonly userService: UserService){}
 
-    @Post('auth/login')
-    @ApiUseTags('user')
-    login(@Body() data: UserDTO){
-        return this.userService.login(data);
-    }
-
-    @Post('auth/register')
-    @ApiUseTags('user')
-    register(@Body() data: UserDTO){
-        return this.userService.register(data);
-    }
-
-    @Get('user/loggeduser')
-    @ApiUseTags('user')
+    @Get('logged')
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
-    getLoguedUser(@Body() data: UserInfoDTO){
+    getLoguedUser(){
         let logguedUser:UserInfoDTO = this.userService.getLoggedUser();
         return this.userService.getById(logguedUser.id);
     }
     
-    @Put('user/update')
-    @ApiUseTags('user')
+    @Put('update')
     @Roles(UserRole.STANDARD, UserRole.AUTHOR)
-    async update(@Body() data: Partial<UserInfoDTO>){
+    @ApiImplicitBody({ name: "userData", required: true, type: UserInfoDTO})
+    async update(@Body() userData: Partial<UserInfoDTO>){
         let logguedUser:UserInfoDTO = await this.userService.getLoggedUser();
-        return this.userService.update(logguedUser.id, data) ;
+        return this.userService.update(logguedUser.id, userData) ;
     }       
 }

@@ -1,10 +1,8 @@
-import { ArticleEntity } from "./article.entity";
+import { ArticleEntity, CommentEntity } from "./article.entity";
 import { UserEntity } from "src/user/user.entity";
 import { ApiModelProperty } from "@nestjs/swagger";
 
-
 export class ArticleDTO {
-    @ApiModelProperty()
     id: number;
 
     @ApiModelProperty()
@@ -13,19 +11,15 @@ export class ArticleDTO {
     @ApiModelProperty()
     content: string;
 
-    @ApiModelProperty()
     likes: number;
 
-    @ApiModelProperty()
     disLikes: number;
 
     @ApiModelProperty()
     picture: string;
 
-    @ApiModelProperty()
     author: UserEntity;
 
-    @ApiModelProperty()
     hidden: boolean;
 
     created_at: Date;
@@ -40,5 +34,27 @@ export class NoteArticleDto {
     articleId: ArticleEntity;
     grade: number
     created_at: Date;
+    updated_at: Date;
+}
+
+
+export class CommentDto {
+    id: number;
+
+    author: UserEntity;
+
+    article: ArticleEntity;
+
+    parent_id: CommentEntity;
+
+    like: number;
+
+    disLikes: number;
+
+    @ApiModelProperty()
+    content: string;
+
+    created_at: Date;
+
     updated_at: Date;
 }

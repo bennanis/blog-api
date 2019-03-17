@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, BeforeInsert,
 
 import * as jwt from 'jsonwebtoken';
 import * as CryptoJS from 'crypto-js';
-import { UserDTO, UserInfoDTO, UserLoginDTO } from "./user.dto";
+import { UserDTO, UserInfoDTO, UserLoginDTO, UserInfoTokenDTO } from "./user.dto";
 import { CommentEntity, ArticleEntity } from "src/article/article.entity";
 import { SectionEntity } from "src/article/section/section.entity";
 
@@ -94,7 +94,7 @@ export class UserEntity {
     toResponseObject(showToken = false) {
         const {id, email, avatar, first_name, last_name, created_at, active, type, updated_at, token} = this;
         if(showToken){
-            let responseObject:UserLoginDTO = {id, email, first_name, last_name, avatar, active, type, created_at, updated_at, token};
+            let responseObject:UserInfoTokenDTO = {id, email, first_name, last_name, avatar, active, type, created_at, updated_at, token};
             return responseObject;  
         }else {
             let responseObject:UserInfoDTO = {id, email, first_name, last_name, avatar, active, type, created_at, updated_at};

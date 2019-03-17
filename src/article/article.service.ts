@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArticleEntity, NoteArticleEntity, CommentEntity } from './article.entity';
 import { Repository } from 'typeorm';
-import { ArticleDTO, NoteArticleDto } from './article.dto';
+import { ArticleDTO, NoteArticleDto, CommentDto } from './article.dto';
 import { UserService } from 'src/user/user.service';
 import { UserInfoDTO } from 'src/user/user.dto';
 import { UserEntity, UserRole } from 'src/user/user.entity';
@@ -161,13 +161,16 @@ export class ArticleService {
         }
     }
 
-    async addCommentArticle(loggedUserId:number, articleId: number, content: string)
+    async addCommentArticle(loggedUserId:number, articleId: number, commentData: CommentDto)
     {
+        if(!commentData.content)
+            throw new HttpException('Missing information !', 404);
+
         let article: ArticleEntity = await this.articleRepository.findOne(articleId);
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
 
         if(!article){throw new HttpException('Article not found ! ', HttpStatus.NOT_FOUND);}
-        let comments = await this.commentRepository.create({author: user, article: article, content: content});
+        let comments = await this.commentRepository.create({author: user, article: article, content: commentData.content});
         await this.commentRepository.save(comments);
         throw new HttpException('Comment added successfully ! ', HttpStatus.CREATED);
     }
@@ -186,8 +189,11 @@ export class ArticleService {
 
     }
 
-    async addCommentComment(loggedUserId:number, commentId: number, content: string)
+    async addCommentComment(loggedUserId:number, commentId: number, commentData: CommentDto)
     {
+        if(!commentData.content)
+            throw new HttpException('Missing information !', 404);
+
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
 
         // Récupérer le commentaire
@@ -205,7 +211,7 @@ export class ArticleService {
             throw new HttpException('Add comment : No permission ! ', HttpStatus.UNAUTHORIZED);
 
         if(article.author.id == loggedUserId){
-            let commentAdd = await this.commentRepository.create({author: user, article: article, content: content, parent_id: comment});
+            let commentAdd = await this.commentRepository.create({author: user, article: article, content: commentData.content, parent_id: comment});
             await this.commentRepository.save(commentAdd);
             throw new HttpException('Comment added successfully ! ', HttpStatus.OK);
         } else {
