@@ -36,6 +36,9 @@ export class ArticleEntity {
     @ManyToMany(type => SectionEntity, section => section.articles)
     sections: SectionEntity[];
 
+    @Column({default: false})
+    hidden: boolean;
+
     @CreateDateColumn()
     created_at: Date;
 
@@ -44,8 +47,8 @@ export class ArticleEntity {
 
 
     toResponseObject() {
-        const {id, titre, content, likes, disLikes, picture, author, created_at, updated_at} = this;
-        let responseObject:ArticleDTO = {id, titre, content, likes, disLikes, picture, author, created_at, updated_at};
+        const {id, titre, content, likes, disLikes, picture, author, hidden, created_at, updated_at} = this;
+        let responseObject:ArticleDTO = {id, titre, content, likes, disLikes, picture, author, hidden, created_at, updated_at};
         return responseObject;  
     }
 

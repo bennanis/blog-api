@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { ArticleDTO, NoteArticleDto } from './article.dto';
 import { UserService } from 'src/user/user.service';
 import { UserInfoDTO } from 'src/user/user.dto';
-import { UserEntity } from 'src/user/user.entity';
+import { UserEntity, UserRole } from 'src/user/user.entity';
 
 @Injectable()
 export class ArticleService {
@@ -46,6 +46,7 @@ export class ArticleService {
         .select(["article.id", "article.titre", "article.created_at"])
         .leftJoinAndSelect("article.author", "user")
         .leftJoinAndSelect("article.comments", "comments")
+        .where({hidden: false})
         .offset(offset)
         .limit(limit)
         .orderBy("article.created_at", "DESC")
@@ -56,9 +57,40 @@ export class ArticleService {
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
         return await this.articleRepository.createQueryBuilder("article")
         .leftJoinAndSelect("article.comments", "comments")
-        .where({author: user})
+        .where({author: user, hidden: false})
         .orderBy("article.created_at", "DESC")
         .getMany();
+    }
+
+    async showHideArticle(articleId: number, type: string){
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId);
+
+        if(!article){
+            throw new HttpException('Article not found ! ', HttpStatus.NOT_FOUND);
+        }
+        if(type == "show")
+            article.hidden = false;
+        else if(type == "hide")
+            article.hidden = true;
+        
+        await this.articleRepository.update(articleId, article);
+        throw new HttpException('Success update !', HttpStatus.CREATED);
+    }
+
+    async getAllHidden(loggedUserId: number){
+        let user: UserEntity = await this.userRepository.findOne(loggedUserId);
+
+        if(user.type == UserRole.ADMIN){
+            return await this.articleRepository.createQueryBuilder("article")
+                .where({hidden: true})
+                .orderBy("article.created_at", "DESC")
+                .getMany();
+        }
+
+        return await this.articleRepository.createQueryBuilder("article")
+            .where({author: user, hidden: 1})
+            .orderBy("article.created_at", "DESC")
+            .getMany();
     }
 
     async update(loggedUserId: number, articleId: number, articleData: Partial<ArticleDTO>)
