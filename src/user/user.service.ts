@@ -1,4 +1,4 @@
-import { Injectable, Req, HttpException } from '@nestjs/common';
+import { Injectable, Req, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
@@ -19,14 +19,14 @@ export class UserService {
     async login(data: UserDTO)
     {
         if(!data.email || !data.password)
-            return {'success': false, 'info': 'Missing information'}
+            throw new HttpException('Email and password are required', HttpStatus.BAD_REQUEST);
         
         const {email, password} = data;
         let user = await this.userRepository.findOne({where: {email}, select: ['id', 'email', 'password', 'first_name', 'last_name', 'avatar', 'type', 'created_at', 'updated_at']})
         if(!user)
-            return {'success': false, 'info': 'Wrong email address'}
+            throw new HttpException('Wrong email address', HttpStatus.BAD_REQUEST);
         else if(!await user.comparePassword(password))
-            return {'success': false, 'info': 'Wrong password'}
+            throw new HttpException('Wrong password', HttpStatus.BAD_REQUEST);
             
         this.loggedUser = user.toResponseObject(true);
         return user.toResponseObject(true);
@@ -35,21 +35,21 @@ export class UserService {
     async register(data: UserDTO)
     {
         if(!data.email)
-            throw new HttpException('Missing email address!', 404);
+            throw new HttpException('Missing email address!', HttpStatus.BAD_REQUEST);
 
         const {email} = data;
         let user = await this.userRepository.findOne({where: {email}});
 
         if(user)
-            throw new HttpException('User already exists !', 404);
+            throw new HttpException('User already exists !', HttpStatus.BAD_REQUEST);
         
         if(!data.password || !data.first_name || !data.last_name)
-            throw new HttpException('Missing information !', 404);
+            throw new HttpException('Missing information !', HttpStatus.BAD_REQUEST);
 
         user = await this.userRepository.create(data);
         await this.userRepository.save(user);
 
-        throw new HttpException('Successful registration !', 200);
+        throw new HttpException('Successful registration !', HttpStatus.CREATED);
     }
 
 
@@ -58,7 +58,7 @@ export class UserService {
         return  new Promise(async resolve => {
             let user = await this.userRepository.findOne(userId);
             if (!user) {
-                throw new HttpException('User does not exist!', 404);
+                throw new HttpException('User does not exist!', HttpStatus.NOT_FOUND);
             }
             resolve(user.toResponseObject());
         });
@@ -68,7 +68,7 @@ export class UserService {
     {
         let user = await this.userRepository.findOne(id);
         if (!user) {
-            throw new HttpException('User does not exist!', 404);
+            throw new HttpException('User does not exist!', HttpStatus.NOT_FOUND);
         }
         if(data.first_name)
             user.first_name = data.first_name;
@@ -80,7 +80,7 @@ export class UserService {
         await this.userRepository.update(id, user);
         this.loggedUser = user.toResponseObject(true); 
 
-        throw new HttpException('Success update !', 200);
+        throw new HttpException('Success update !', HttpStatus.CREATED);
     }
 
 }
