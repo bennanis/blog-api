@@ -36,6 +36,12 @@ export class ArticleController {
         return await this.articleService.getAllHidden(logguedUser.id);
     }
 
+    @Put('/:articleId/hide')
+    @Roles(UserRole.AUTHOR)
+    async hideArticle(@Param('articleId') articleId: number){
+        return this.articleService.showHideArticle(articleId, "hide") ;
+    }
+
     @Get(':articleId')
     async getById(@Param('articleId') articleId:number){
         return this.articleService.getById(articleId);

@@ -35,7 +35,7 @@ export class ArticleService {
     }
 
     async getById(articleId:number){
-        let article: ArticleEntity = await this.articleRepository.findOne(articleId, {where: {hidden:0}});
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId, {where: {hidden:false}});
         if(!article)
             throw new HttpException('Article not found ! ', HttpStatus.NOT_FOUND);
         return article;
@@ -47,7 +47,7 @@ export class ArticleService {
       return await this.articleRepository.createQueryBuilder("article")
         .select(["article.id", "article.titre", "article.created_at"])
         .leftJoinAndSelect("article.author", "user")
-        .where({hidden: 0})
+        .where({hidden: false})
         .offset(offset)
         .limit(limit)
         .orderBy("article.created_at", "DESC")
@@ -57,9 +57,24 @@ export class ArticleService {
     async getAllMine(loggedUserId: number){
         let user: UserEntity = await this.userRepository.findOne(loggedUserId);
         return await this.articleRepository.createQueryBuilder("article")
-        .where({author: user, hidden: 0})
+        .where({author: user, hidden: false})
         .orderBy("article.created_at", "DESC")
         .getMany();
+    }
+
+    async showHideArticle(articleId: number, type: string){
+        let article: ArticleEntity = await this.articleRepository.findOne(articleId);
+
+        if(!article){
+            throw new HttpException('Article not found ! ', HttpStatus.NOT_FOUND);
+        }
+        if(type == "show")
+            article.hidden = false;
+        else if(type == "hide")
+            article.hidden = true;
+        
+        await this.articleRepository.update(articleId, article);
+        throw new HttpException('Success update !', HttpStatus.CREATED);
     }
 
     async getAllHidden(loggedUserId: number){
@@ -67,7 +82,7 @@ export class ArticleService {
 
         if(user.type == UserRole.ADMIN){
             return await this.articleRepository.createQueryBuilder("article")
-                .where({hidden: 1})
+                .where({hidden: true})
                 .orderBy("article.created_at", "DESC")
                 .getMany();
         }

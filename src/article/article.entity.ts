@@ -38,7 +38,7 @@ export class ArticleEntity {
     @ManyToMany(type => SectionEntity, section => section.articles)
     sections: SectionEntity[];
 
-    @Column({default: 0})
+    @Column({default: false})
     hidden: boolean;
 
     @CreateDateColumn()
