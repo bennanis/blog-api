@@ -68,12 +68,21 @@ export class AdminService {
         return user;
     }
 
-    async getAllUser(){
-        return await this.userRepository.createQueryBuilder("user")
-        .select(["user.id", "user.first_name", "user.last_name", "user.type"])
-        .orderBy("user.created_at", "DESC")
-        .getMany();
+    async getAllUser(orderByRole: string){
+        
+        if(orderByRole !== "true"){
+            return await this.userRepository.createQueryBuilder("user")
+            .select(["user.id", "user.first_name", "user.last_name", "user.type"])
+            .orderBy("user.created_at", "DESC")
+            .getMany();
+        } else {
+            return await this.userRepository.createQueryBuilder("user")
+            .orderBy("user.type", "ASC")
+            .getMany();
+        }
+
     }
+
 
     async changeUserType(logguedUserId:number,userId: number,type:string){
         let user = await this.userRepository.findOne(userId);

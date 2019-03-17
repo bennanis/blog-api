@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Put, Body, Param, HttpException, HttpStatus, Delete, Get } from '@nestjs/common';
+import { Controller, UseGuards, Put, Body, Param, HttpException, HttpStatus, Delete, Get, Query } from '@nestjs/common';
 import { RoleGuard } from 'src/user/guards/role.guard';
 import { UserService } from 'src/user/user.service';
 import { Roles } from 'src/user/decorators/roles.decorator';
@@ -30,9 +30,10 @@ export class AdminController {
 
     @Get('user/all')
     @Roles(UserRole.ADMIN)
-    async getAllUser(){
-        return this.adminService.getAllUser();
+    async getAllUser(@Query('byRole') byRole){
+        return this.adminService.getAllUser(byRole);
     }
+
 
     @Get('user/:userId')
     @Roles(UserRole.ADMIN)
